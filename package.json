@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "config-sys": "node config-sys.js",
+    "config-sys": "node config-sys/config-sys.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Ronnie Geraghty",
