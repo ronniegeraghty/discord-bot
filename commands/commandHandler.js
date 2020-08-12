@@ -12,6 +12,9 @@ function commandHandler(msg) {
     case "play":
       play.command(msg);
       break;
+    case "pause":
+      play.pause();
+      break;
   }
 }
 module.exports.commandHandler = commandHandler;

@@ -12,6 +12,9 @@ bot.on("ready", () => {
 });
 
 bot.on("message", (msg) => {
+  console.log(
+    `-------------------------------------------\nNEW MESSAGE\n-------------------------------------------`
+  );
   console.log(`MESSAGE: ${msg.content}`);
   if (msg.content.substring(0, 1) === PREFIX) {
     commandHandler(msg);
