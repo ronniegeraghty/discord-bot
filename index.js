@@ -2,14 +2,10 @@ const Discord = require("discord.js");
 const bot = new Discord.Client();
 require("dotenv").config();
 const { commandHandler } = require("./commands/commandHandler");
-const fs = require("fs");
-const ytdl = require("ytdl-core");
 
 const token = process.env.TOKEN;
 
 const PREFIX = "*";
-
-var servers = {};
 
 bot.on("ready", () => {
   console.log("This bot is online");
