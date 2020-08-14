@@ -18,6 +18,8 @@
     "discord.js": "github:discordjs/discord.js",
     "dotenv": "^8.2.0",
     "opusscript": "0.0.7",
+    "sqlite3": "^5.0.0",
+    "typeorm": "^0.2.25",
     "ytdl-core": "^3.2.1"
   },
   "devDependencies": {

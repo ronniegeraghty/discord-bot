@@ -1,12 +1,15 @@
 import { AkairoClient, CommandHandler, ListenerHandler } from "discord-akairo";
 import { User, Message } from "discord.js";
 import { join, dirname } from "path";
-import { prefix, owners } from "../Config";
+import { prefix, owners, dbName } from "../Config";
+import { Connection } from "typeorm";
+import Database from "../structures/Database";
 
 declare module "discord-akairo" {
   interface AkairoClient {
     commandHanlder: CommandHandler;
     listenerHandler: ListenerHandler;
+    db: Connection;
   }
 }
 
@@ -17,6 +20,7 @@ interface BotOptions {
 
 export default class BotClient extends AkairoClient {
   public config: BotOptions;
+  public db!: Connection;
   public listenerHandler: ListenerHandler = new ListenerHandler(this, {
     directory: join(__dirname, "..", "listeners"),
   });
@@ -61,6 +65,10 @@ export default class BotClient extends AkairoClient {
     });
     this.commandHanlder.loadAll();
     this.listenerHandler.loadAll();
+
+    this.db = Database.get(dbName);
+    await this.db.connect();
+    await this.db.synchronize();
   }
 
   public async start(): Promise<string> {
