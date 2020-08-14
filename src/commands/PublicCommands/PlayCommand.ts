@@ -1,5 +1,6 @@
 import { Command } from "discord-akairo";
 import { Message, GuildMember } from "discord.js";
+import ytdl from "ytdl-core";
 
 export default class PlayCommand extends Command {
   public constructor() {
@@ -31,5 +32,13 @@ export default class PlayCommand extends Command {
     if (!url) {
       return message.util.send(`${message.member} you must include a link`);
     }
+    if (!message.member.voice.channel) {
+      return message.util.send(
+        `${message.member} you must be in a voice channel to play music.`
+      );
+    }
+    message.member.voice.channel.join().then((connection) => {
+      connection.play(ytdl(url.toString(), { filter: "audioonly" }));
+    });
   }
 }
