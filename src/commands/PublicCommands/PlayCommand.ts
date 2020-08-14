@@ -1,6 +1,8 @@
 import { Command } from "discord-akairo";
 import { Message, GuildMember } from "discord.js";
 import ytdl from "ytdl-core";
+import { Repository } from "typeorm";
+import { MusicQueue } from "../../models/MusicQueue";
 
 export default class PlayCommand extends Command {
   public constructor() {
@@ -25,10 +27,10 @@ export default class PlayCommand extends Command {
       ],
     });
   }
-  public exec(
-    message: Message,
-    { url }: { url: string }
-  ): Promise<Message> | void {
+  public async exec(message: Message, { url }: { url: URL }): Promise<Message> {
+    const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
+      MusicQueue
+    );
     if (!url) {
       return message.util.send(`${message.member} you must include a link`);
     }
@@ -37,6 +39,13 @@ export default class PlayCommand extends Command {
         `${message.member} you must be in a voice channel to play music.`
       );
     }
+
+    await musicQueueRepo.insert({
+      guild: message.guild.id,
+      user: message.author.id,
+      url: url,
+    });
+
     message.member.voice.channel.join().then((connection) => {
       connection.play(ytdl(url.toString(), { filter: "audioonly" }));
     });
