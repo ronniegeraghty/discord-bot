@@ -40,10 +40,14 @@ export default class PlayCommand extends Command {
       );
     }
 
+    const videoTitle: string = (await ytdl.getBasicInfo(url.toString()))
+      .videoDetails.title;
+
     await musicQueueRepo.insert({
       guild: message.guild.id,
       user: message.author.id,
       url: url,
+      title: videoTitle,
     });
 
     message.member.voice.channel.join().then((connection) => {

@@ -13,4 +13,10 @@ export class MusicQueue {
 
   @Column({ type: "text" })
   url!: URL;
+
+  @Column({ type: "text" })
+  title!: string;
+
+  @Column({ type: "date", default: Date.now() })
+  date: Date;
 }
