@@ -35,8 +35,13 @@ export default class HelpCommand extends Command {
     let description: string[] = [];
     commands.forEach((command: Command) => {
       console.log(`${command.id}: ${command.description.content}`);
+      let example: string = command.description.examples
+        .map((ex) => `-${ex}\n`)
+        .join("");
+      console.log(`EXAMPLES: ${example}`);
+
       description.push(
-        `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*: ${command.description.examples}\n`
+        `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}\n`
       );
     });
     return message.util.send(
