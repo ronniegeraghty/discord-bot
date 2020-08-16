@@ -1,5 +1,5 @@
 import { AkairoClient, CommandHandler, ListenerHandler } from "discord-akairo";
-import { User, Message } from "discord.js";
+import { User, Message, StreamDispatcher } from "discord.js";
 import { join, dirname } from "path";
 import { prefix, owners, dbName } from "../Config";
 import { Connection } from "typeorm";
@@ -21,6 +21,7 @@ interface BotOptions {
 export default class BotClient extends AkairoClient {
   public config: BotOptions;
   public db!: Connection;
+  public dispatchers: StreamDispatcher[];
   public listenerHandler: ListenerHandler = new ListenerHandler(this, {
     directory: join(__dirname, "..", "listeners"),
   });
