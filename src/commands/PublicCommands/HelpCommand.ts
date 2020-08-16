@@ -18,13 +18,18 @@ export default class HelpCommand extends Command {
           match: "option",
           flag: "-color",
         },
+        {
+          id: "verbos",
+          match: "flag",
+          flag: "-v",
+        },
       ],
     });
   }
 
   public async exec(
     message: Message,
-    { color }: { color: string }
+    { color, verbos }: { color: string; verbos: boolean }
   ): Promise<Message> {
     let commands: Set<Command> = new Set();
     this.client.commandHanlder.aliases.array().forEach((alias) => {
@@ -36,9 +41,13 @@ export default class HelpCommand extends Command {
       let example: string = command.description.examples
         .map((ex) => `-${ex}\n`)
         .join("");
-      description.push(
-        `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`
-      );
+      if (verbos) {
+        description.push(
+          `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`
+        );
+      } else {
+        description.push(`**${command.id}**: ${command.description.content}\n`);
+      }
     });
     return message.util.send(
       new MessageEmbed()
