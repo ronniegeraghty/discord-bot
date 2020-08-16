@@ -26,7 +26,6 @@ export default class HelpCommand extends Command {
     message: Message,
     { color }: { color: string }
   ): Promise<Message> {
-    console.log(color);
     let commands: Set<Command> = new Set();
     this.client.commandHanlder.aliases.array().forEach((alias) => {
       if (alias !== null)
@@ -34,12 +33,9 @@ export default class HelpCommand extends Command {
     });
     let description: string[] = [];
     commands.forEach((command: Command) => {
-      console.log(`${command.id}: ${command.description.content}`);
       let example: string = command.description.examples
         .map((ex) => `-${ex}\n`)
         .join("");
-      console.log(`EXAMPLES: ${example}`);
-
       description.push(
         `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`
       );
