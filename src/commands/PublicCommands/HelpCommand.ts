@@ -41,7 +41,7 @@ export default class HelpCommand extends Command {
       console.log(`EXAMPLES: ${example}`);
 
       description.push(
-        `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}\n`
+        `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`
       );
     });
     return message.util.send(
