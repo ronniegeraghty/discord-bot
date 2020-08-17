@@ -18,27 +18,30 @@ export default class HelpCommand extends Command {
           match: "option",
           flag: "-color",
         },
+        {
+          id: "verbos",
+          match: "flag",
+          flag: "-v",
+        },
       ],
     });
   }
 
   public async exec(
     message: Message,
-    { color }: { color: string }
+    { color, verbos }: { color: string; verbos: boolean }
   ): Promise<Message> {
     let commands: Set<Command> = new Set();
     this.client.commandHanlder.aliases.array().forEach((alias) => {
-      if (alias !== null)
-        commands.add(this.client.commandHanlder.findCommand(alias));
+      commands.add(this.client.commandHanlder.findCommand(alias));
     });
     let description: string[] = [];
     commands.forEach((command: Command) => {
-      let example: string = command.description.examples
-        .map((ex) => `-${ex}\n`)
-        .join("");
-      description.push(
-        `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`
-      );
+      if (verbos) {
+        description.push(helpVerbos(command));
+      } else {
+        description.push(help(command));
+      }
     });
     return message.util.send(
       new MessageEmbed()
@@ -48,3 +51,16 @@ export default class HelpCommand extends Command {
     );
   }
 }
+
+function help(command: Command): string {
+  return `**${command.id}**: ${command.description.content}\n`;
+}
+module.exports.help = help;
+
+function helpVerbos(command: Command): string {
+  let example: string = command.description.examples
+    .map((ex) => `-${ex}\n`)
+    .join("");
+  return `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`;
+}
+module.exports.helpVerbos = helpVerbos;
