@@ -10,7 +10,7 @@ export default class NextCommand extends Command {
       aliases: ["next", "skip"],
       category: "Public Commands",
       description: {
-        context: "Skip to the next sond in the queue",
+        content: "Skip to the next sond in the queue",
         usage: "next",
         examples: ["next", "skip"],
       },
