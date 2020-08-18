@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, GuildMember, MessageEmbed } from "discord.js";
 import { Repository } from "typeorm";
 import { MusicQueue } from "../../models/MusicQueue";
@@ -24,7 +24,7 @@ export default class QueueCommand extends Command {
     });
   }
 
-  public async exec(
+  public async execute(
     message: Message,
     { clear }: { clear: boolean }
   ): Promise<Message> {

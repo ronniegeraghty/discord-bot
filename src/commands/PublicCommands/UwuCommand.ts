@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, MessageEmbed } from "discord.js";
 
 export default class UwuCommand extends Command {
@@ -14,7 +14,7 @@ export default class UwuCommand extends Command {
       ratelimit: 3,
     });
   }
-  public exec(message: Message): Promise<Message> {
+  public execute(message: Message): Promise<Message> {
     return message.util.send(
       new MessageEmbed()
         .setTitle(`WIFU`)

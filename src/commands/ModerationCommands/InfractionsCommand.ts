@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, GuildMember, User, MessageEmbed } from "discord.js";
 import { Repository } from "typeorm";
 import { Warns } from "../../models/Warns";
@@ -25,7 +25,7 @@ export default class InfractionsCommand extends Command {
     });
   }
 
-  public async exec(
+  public async execute(
     message: Message,
     { member }: { member: GuildMember }
   ): Promise<Message> {

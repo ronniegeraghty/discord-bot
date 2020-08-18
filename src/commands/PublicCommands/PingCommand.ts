@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message } from "discord.js";
 import { helpVerbos } from "./HelpCommand";
 export default class PingCommand extends Command {
@@ -12,20 +12,10 @@ export default class PingCommand extends Command {
         examples: ["ping"],
       },
       ratelimit: 3,
-      args: [
-        {
-          id: "help",
-          match: "flag",
-          flag: "-help",
-        },
-      ],
     });
   }
 
-  public exec(message: Message, { help }: { help: boolean }): Promise<Message> {
-    if (help) {
-      return message.util.send(helpVerbos(this));
-    }
+  public execute(message: Message): Promise<Message> {
     return message.util.send(`Pong! \`${this.client.ws.ping}ms\``);
   }
 }
