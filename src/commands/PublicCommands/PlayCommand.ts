@@ -53,10 +53,6 @@ export default class PlayCommand extends Command {
       title: videoTitle,
     });
 
-    this.client.emit("play", message);
-
-    message.member.voice.channel.join().then((connection) => {
-      connection.play(ytdl(url.toString(), { filter: "audioonly" }));
-    });
+    this.client.emit("play", message, url);
   }
 }
