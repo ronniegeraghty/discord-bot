@@ -5,7 +5,7 @@ import {
   ArgumentGenerator,
 } from "discord-akairo";
 import { Message } from "discord.js";
-import { helpVerbos } from "../commands/PublicCommands/HelpCommand";
+import { helpVerbos } from "./Help";
 
 export default class Command extends AkairoCommand {
   public constructor(id: string, options: CommandOptions) {

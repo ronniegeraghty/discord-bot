@@ -1,5 +1,6 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, MessageEmbed } from "discord.js";
+import { help, helpVerbos } from "../../client/Help";
 
 export default class HelpCommand extends Command {
   public constructor() {
@@ -7,9 +8,13 @@ export default class HelpCommand extends Command {
       aliases: ["help"],
       category: "Public Commands",
       description: {
-        content: `Get help on how to use the bot`,
-        useage: "help",
-        examples: ["help"],
+        content: `Get help on how to use the bot.`,
+        usage: "help",
+        flags: [
+          `**-v** verbos option`,
+          `**-color** change color for embed, takes 6 digit hex color code`,
+        ],
+        examples: ["help", "help -v"],
       },
       ratelimit: 3,
       args: [
@@ -27,7 +32,7 @@ export default class HelpCommand extends Command {
     });
   }
 
-  public async exec(
+  public async execute(
     message: Message,
     { color, verbos }: { color: string; verbos: boolean }
   ): Promise<Message> {
@@ -51,15 +56,3 @@ export default class HelpCommand extends Command {
     );
   }
 }
-
-export function help(command: Command): string {
-  return `**${command.id}**: ${command.description.content}\n`;
-}
-
-export function helpVerbos(command: Command): string {
-  let example: string = command.description.examples
-    .map((ex) => `\t-${ex}\n`)
-    .join("");
-  return `**${command.id}**: ${command.description.content}\n*Usage*: ${command.description.usage}\n*Examples*:\n ${example}`;
-}
-module.exports.HelpVerbos = helpVerbos;

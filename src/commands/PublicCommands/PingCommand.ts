@@ -1,6 +1,6 @@
 import Command from "../../client/Command";
 import { Message } from "discord.js";
-import { helpVerbos } from "./HelpCommand";
+
 export default class PingCommand extends Command {
   public constructor() {
     super("ping", {
