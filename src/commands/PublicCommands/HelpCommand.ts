@@ -52,15 +52,14 @@ export default class HelpCommand extends Command {
   }
 }
 
-function help(command: Command): string {
+export function help(command: Command): string {
   return `**${command.id}**: ${command.description.content}\n`;
 }
-module.exports.help = help;
 
-function helpVerbos(command: Command): string {
+export function helpVerbos(command: Command): string {
   let example: string = command.description.examples
-    .map((ex) => `-${ex}\n`)
+    .map((ex) => `\t-${ex}\n`)
     .join("");
-  return `**${command.id}**: ${command.description.content}\n\t*Usage*: ${command.description.usage}\n\t*Examples*:\n ${example}`;
+  return `**${command.id}**: ${command.description.content}\n*Usage*: ${command.description.usage}\n*Examples*:\n ${example}`;
 }
-module.exports.helpVerbos = helpVerbos;
+module.exports.HelpVerbos = helpVerbos;
