@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, GuildMember } from "discord.js";
 import ytdl from "ytdl-core";
 import { Repository } from "typeorm";
@@ -27,7 +27,10 @@ export default class PlayCommand extends Command {
       ],
     });
   }
-  public async exec(message: Message, { url }: { url: URL }): Promise<Message> {
+  public async execute(
+    message: Message,
+    { url }: { url: URL }
+  ): Promise<Message> {
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
     );

@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, GuildMember, MessageEmbed, ImageSize } from "discord.js";
 
 export default class AvatarCommand extends Command {
@@ -37,7 +37,7 @@ export default class AvatarCommand extends Command {
       ],
     });
   }
-  public exec(
+  public execute(
     message: Message,
     { member, size }: { member: GuildMember; size: number }
   ): Promise<Message> {

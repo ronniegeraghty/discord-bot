@@ -1,4 +1,4 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message, GuildMember } from "discord.js";
 import { Repository } from "typeorm";
 import { Warns } from "../../models/Warns";
@@ -19,12 +19,6 @@ export default class WarnCommand extends Command {
         {
           id: "member",
           type: "member",
-          prompt: {
-            start: (msg: Message) =>
-              `${msg.author}, please provide a member to warn ...`,
-            retry: (msg: Message) =>
-              `${msg.author}, please provide a valid member to warn...`,
-          },
         },
         {
           id: "reason",
@@ -36,10 +30,12 @@ export default class WarnCommand extends Command {
     });
   }
 
-  public async exec(
+  public async execute(
     message: Message,
     { member, reason }: { member: GuildMember; reason: string }
   ): Promise<Message> {
+    if (!member)
+      return message.util.reply(`You must include the member to warn!`);
     const warnRepo: Repository<Warns> = this.client.db.getRepository(Warns);
     if (
       member.roles.highest.position >= message.member.roles.highest.position &&

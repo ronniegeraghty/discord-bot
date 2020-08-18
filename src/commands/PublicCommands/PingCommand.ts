@@ -1,6 +1,6 @@
-import { Command } from "discord-akairo";
+import Command from "../../client/Command";
 import { Message } from "discord.js";
-
+import { helpVerbos } from "./HelpCommand";
 export default class PingCommand extends Command {
   public constructor() {
     super("ping", {
@@ -8,14 +8,14 @@ export default class PingCommand extends Command {
       category: "Public Command",
       description: {
         content: "Check the latency of the ping to the Discord API",
-        useage: "ping",
+        usage: "ping",
         examples: ["ping"],
       },
       ratelimit: 3,
     });
   }
 
-  public exec(message: Message): Promise<Message> {
+  public execute(message: Message): Promise<Message> {
     return message.util.send(`Pong! \`${this.client.ws.ping}ms\``);
   }
 }
