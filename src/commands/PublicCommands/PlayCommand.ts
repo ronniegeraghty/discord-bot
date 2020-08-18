@@ -53,6 +53,6 @@ export default class PlayCommand extends Command {
       title: videoTitle,
     });
 
-    this.client.emit("play", message, url);
+    this.client.emit("play", message);
   }
 }

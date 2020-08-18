@@ -16,7 +16,7 @@ export default class ReadyListener extends Listener {
     });
   }
 
-  public async exec(message: Message): Promise<void> {
+  public async exec(message: Message, next: boolean = false): Promise<void> {
     console.log(`PLAY LISTENER: MESSAGE: ${message.content}`);
     //Get the music queue.
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
@@ -29,6 +29,8 @@ export default class ReadyListener extends Listener {
     let dispatcher = this.getDispatcher(message.member.voice.channel);
     //If there was no dispatcher for voice channel create one.
     if (!dispatcher) {
+      //If music queue is empty stop
+      if (!musicQueue.length) return;
       message.member.voice.channel.join().then((connection) => {
         dispatcher = connection.play(
           ytdl(musicQueue[0].url.toString(), { filter: "audioonly" })
@@ -41,7 +43,10 @@ export default class ReadyListener extends Listener {
         dispatcher.on("speaking", async (speaking) => {
           if (!speaking) {
             await musicQueueRepo.delete(musicQueue[0]);
-            this.client.emit("play", message);
+            this.client.dispatchers = this.client.dispatchers.filter(
+              (disp) => disp.channel.id !== message.member.voice.channel.id
+            );
+            this.client.emit("play", message, true);
           }
         });
       });
@@ -49,6 +54,9 @@ export default class ReadyListener extends Listener {
       //If dispatcher exists then see if it is playing or paused
       let paused = dispatcher.paused;
       console.log(`PAUSED: ${paused}`);
+
+      if (next) {
+      }
     }
 
     //If playing do nothing
