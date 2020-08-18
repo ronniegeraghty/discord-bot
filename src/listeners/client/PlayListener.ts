@@ -16,8 +16,7 @@ export default class ReadyListener extends Listener {
     });
   }
 
-  public async exec(message: Message, next: boolean = false): Promise<void> {
-    console.log(`PLAY LISTENER: MESSAGE: ${message.content}`);
+  public async exec(message: Message): Promise<void> {
     //Get the music queue.
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
@@ -41,41 +40,24 @@ export default class ReadyListener extends Listener {
           channel: message.member.voice.channel,
         });
         dispatcher.on("speaking", async (speaking) => {
-          if (!speaking) {
+          // console.log(`SPEAKING : ${speaking}`);
+          // console.log(`PAUSED: ${dispatcher.paused}`);
+          if (!speaking && !dispatcher.paused) {
             await musicQueueRepo.delete(musicQueue[0]);
             this.client.dispatchers = this.client.dispatchers.filter(
               (disp) => disp.channel.id !== message.member.voice.channel.id
             );
-            this.client.emit("play", message, true);
+            this.client.emit("play", message);
           }
         });
       });
     } else {
       //If dispatcher exists then see if it is playing or paused
       let paused = dispatcher.paused;
-      console.log(`PAUSED: ${paused}`);
-
-      if (next) {
+      if (paused) {
+        dispatcher.resume();
       }
     }
-
-    //If playing do nothing
-    //If paused.
-
-    // let dispatcherArray = this.client.dispatchers.filter(
-    //   (disp) => disp.channel.id === message.member.voice.channel.id
-    // );
-    // const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
-    //   MusicQueue
-    // );
-    // const musicQueue: MusicQueue[] = await musicQueueRepo.find({
-    //   guild: message.guild.id,
-    // });
-    // if (!dispatcherArray.length) {
-    //   message.member.voice.channel.join().then((connection) => {
-
-    //   });
-    // }
   }
 
   private getDispatcher(channel: VoiceChannel): StreamDispatcher | null {
