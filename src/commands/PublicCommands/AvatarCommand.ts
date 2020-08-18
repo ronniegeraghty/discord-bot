@@ -7,9 +7,17 @@ export default class AvatarCommand extends Command {
       aliases: ["avatar", "av"],
       category: "Public Commands",
       description: {
-        content: "Display the avatar of a member",
+        content: `Display the avatar of a member. `,
         usage: "avatar [ member ]",
-        examples: ["avatar", "avatar @Host#0001", "avatar host"],
+        flags: [
+          "**-size=** to set the size of avatar, size should follow pattern of 2^(n)",
+        ],
+        examples: [
+          "avatar",
+          "avatar @Host#0001",
+          "avatar host",
+          "avatar host -size=512",
+        ],
       },
       ratelimit: 3,
       args: [

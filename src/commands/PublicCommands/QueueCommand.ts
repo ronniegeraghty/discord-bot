@@ -11,14 +11,15 @@ export default class QueueCommand extends Command {
       description: {
         content: "Check the songs in the queue",
         usage: "queue",
-        examples: ["queue"],
+        flags: [`**-clear** will clear the queue`],
+        examples: ["queue", "queue -clear"],
       },
       ratelimit: 3,
       args: [
         {
           id: "clear",
           match: "flag",
-          flag: "clear",
+          flag: "-clear",
         },
       ],
     });
