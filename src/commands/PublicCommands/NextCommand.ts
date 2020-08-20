@@ -33,7 +33,7 @@ export default class NextCommand extends Command {
     if (!musicQueue.length) return message.util.reply("The queue is empty.");
     await musicQueueRepo.delete(musicQueue[0]);
     //Delete the dispatcher
-    let dispatcher = this.getDispatcher(message.member.voice.channel);
+    let dispatcher = this.client.getDispatcher(message.member.voice.channel);
     if (!dispatcher)
       return message.util.reply(`Nothing is playing in your voice channel`);
     else {
@@ -46,12 +46,5 @@ export default class NextCommand extends Command {
     this.client.emit("play", message);
     if (musicQueue.length === 1)
       return message.util.reply("You have reached the end of the queue");
-  }
-  private getDispatcher(channel: VoiceChannel): StreamDispatcher | null {
-    let dispatcher: StreamDispatcher;
-    this.client.dispatchers.forEach((disp) => {
-      if (disp.channel.id === channel.id) dispatcher = disp.streamDispatcher;
-    });
-    return dispatcher;
   }
 }

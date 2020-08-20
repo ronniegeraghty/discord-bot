@@ -16,7 +16,7 @@ export default class PauseCommand extends Command {
     });
   }
   public execute(message: Message): Promise<Message> {
-    let dispatcher = this.getDispatcher(message.member.voice.channel);
+    let dispatcher = this.client.getDispatcher(message.member.voice.channel);
     if (!dispatcher)
       return message.util.reply(
         `Either no music is playing or you are not in a voice channel where music is playing.`
@@ -24,12 +24,5 @@ export default class PauseCommand extends Command {
     else {
       dispatcher.pause(true);
     }
-  }
-  private getDispatcher(channel: VoiceChannel): StreamDispatcher | null {
-    let dispatcher: StreamDispatcher;
-    this.client.dispatchers.forEach((disp) => {
-      if (disp.channel.id === channel.id) dispatcher = disp.streamDispatcher;
-    });
-    return dispatcher;
   }
 }
