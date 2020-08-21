@@ -19,21 +19,25 @@ export default class NextCommand extends Command {
   }
 
   public async execute(message: Message): Promise<Message> {
-    // Make sure member is in the voice channel
+    // Make sure member is in the voice channel, if not send reply
     if (!message.member.voice.channel) {
       message.util.reply(`You must be in a voice channel to use this command`);
     }
-    //Delete top song off music queue
+    //Get MusicQueueRepo
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
     );
+    //Find the music queue for the guild id (server)
     const musicQueue: MusicQueue[] = await musicQueueRepo.find({
       guild: message.guild.id,
     });
+    //Check if queue is empty, if so send reply
     if (!musicQueue.length) return message.util.reply("The queue is empty.");
+    //delete the first song in the queue
     await musicQueueRepo.delete(musicQueue[0]);
-    //Delete the dispatcher
+    //Get Dispatcher for the voice channel
     let dispatcher = this.client.getDispatcher(message.member.voice.channel);
+    //Check if there is a dispatcher, if not send reply
     if (!dispatcher)
       return message.util.reply(`Nothing is playing in your voice channel`);
     else {

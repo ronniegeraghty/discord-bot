@@ -36,18 +36,24 @@ export default class HelpCommand extends Command {
     message: Message,
     { color, verbos }: { color: string; verbos: boolean }
   ): Promise<Message> {
+    //Make a Set to hold all commands with no repeats
     let commands: Set<Command> = new Set();
+    //For all aliases, add that command to Set of commands
     this.client.commandHanlder.aliases.array().forEach((alias) => {
       commands.add(this.client.commandHanlder.findCommand(alias));
     });
+    //Make an array for all the command descriptions
     let description: string[] = [];
+    //For all commands, add command descriptino string to description array
     commands.forEach((command: Command) => {
+      //Check for verbos flag, if included add verbos description string to array
       if (verbos) {
         description.push(helpVerbos(command));
       } else {
         description.push(help(command));
       }
     });
+    //return message embed with all descrtions.
     return message.util.send(
       new MessageEmbed()
         .setAuthor(`Help`)
