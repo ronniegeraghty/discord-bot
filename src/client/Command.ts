@@ -9,6 +9,7 @@ import { helpVerbos } from "./Help";
 
 export default class Command extends AkairoCommand {
   public constructor(id: string, options: CommandOptions) {
+    // Default -help flag to add to every command
     let helpOptions: ArgumentOptions = {
       id: "help",
       match: "flag",
@@ -17,9 +18,9 @@ export default class Command extends AkairoCommand {
     let argsObjArr: ArgumentOptions[] = addObj(options.args, helpOptions);
     super(id, { ...options, args: argsObjArr });
   }
-
+  //New method to use to say what happens when a Command is called.
   public execute?(message: Message, args: any): any;
-
+  //Set up to see if help flag was used, if so don't execute the command just send message with command description
   public exec(message: Message, args: any) {
     if (args.help) return message.util.send(helpVerbos(this));
     else {
@@ -28,6 +29,12 @@ export default class Command extends AkairoCommand {
   }
 }
 
+/**
+ * Given an Array of Argument Options and a new Argument Option returns array with all Argument Options.
+ * @param objArr {ArgumentOptions[] | ArgumentGenerator} array of arrguments options to add and argument too
+ * @param obj  {ArgumentOptions} Argument options to be added to previous array
+ * @returns {ArgumentOptions[]}
+ */
 function addObj(
   objArr: ArgumentOptions[] | ArgumentGenerator,
   obj: ArgumentOptions

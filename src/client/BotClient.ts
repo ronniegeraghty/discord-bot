@@ -10,9 +10,9 @@ declare module "discord-akairo" {
   interface AkairoClient {
     commandHanlder: CommandHandler;
     listenerHandler: ListenerHandler;
-    db: Connection;
-    dispatchers: Dispatcher[];
-    getDispatcher: (channel: VoiceChannel) => StreamDispatcher | null;
+    db: Connection; //Connection to Database
+    dispatchers: Dispatcher[]; //Array of dispatchers current active
+    getDispatcher: (channel: VoiceChannel) => StreamDispatcher | null; //Given a voice channel returns the respective dispatcher
   }
 }
 

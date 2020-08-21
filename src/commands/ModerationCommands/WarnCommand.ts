@@ -34,9 +34,12 @@ export default class WarnCommand extends Command {
     message: Message,
     { member, reason }: { member: GuildMember; reason: string }
   ): Promise<Message> {
+    //Check if member mentioned, if not reply with message
     if (!member)
       return message.util.reply(`You must include the member to warn!`);
+    //Get Warns Repo
     const warnRepo: Repository<Warns> = this.client.db.getRepository(Warns);
+    //Check if Member has higher permissions than sender, if so reply with message
     if (
       member.roles.highest.position >= message.member.roles.highest.position &&
       message.author.id !== message.guild.ownerID
@@ -45,14 +48,14 @@ export default class WarnCommand extends Command {
         "this member has higher or equal roles to you!"
       );
     }
-
+    //Add Warn to Warn Repo
     await warnRepo.insert({
       guild: message.guild.id,
       user: member.id,
       moderator: message.author.id,
       reason: reason,
     });
-
+    //Reply with message saying user has been warned
     return message.util.send(
       `**${member.user.tag}** has been warned by **${message.author.tag}** for *${reason}*`
     );
