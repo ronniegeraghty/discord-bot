@@ -41,14 +41,18 @@ export default class NextCommand extends Command {
     if (!dispatcher)
       return message.util.reply(`Nothing is playing in your voice channel`);
     else {
+      //remove the dispatcher from client's dispatcher array
       this.client.dispatchers = this.client.dispatchers.filter(
         (disp) => disp.channel.id !== message.member.voice.channel.id
       );
+      //Destroy the dispatcher
       dispatcher.destroy();
     }
-    //emit play
-    this.client.emit("play", message);
+    //If there is not next sound in the queue send reply
     if (musicQueue.length === 1)
       return message.util.reply("You have reached the end of the queue");
+
+    //emit play to play the next song in the queue
+    this.client.emit("play", message);
   }
 }
