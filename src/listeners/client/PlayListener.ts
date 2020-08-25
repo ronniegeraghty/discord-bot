@@ -17,19 +17,21 @@ export default class ReadyListener extends Listener {
   }
 
   public async exec(message: Message): Promise<void> {
-    //Get the music queue.
+    //Get the music queue Repo.
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
     );
+    //Get the music queue
     const musicQueue: MusicQueue[] = await musicQueueRepo.find({
       guild: message.guild.id,
     });
     //Get the dispatcher for voice channel if there is one.
-    let dispatcher = this.getDispatcher(message.member.voice.channel);
+    let dispatcher = this.client.getDispatcher(message.member.voice.channel);
     //If there was no dispatcher for voice channel create one.
     if (!dispatcher) {
       //If music queue is empty stop
       if (!musicQueue.length) return;
+      //Connect to voice channel, play audio and add dispatcher to list
       message.member.voice.channel.join().then((connection) => {
         dispatcher = connection.play(
           ytdl(musicQueue[0].url.toString(), { filter: "audioonly" })
@@ -39,6 +41,7 @@ export default class ReadyListener extends Listener {
           streamDispatcher: dispatcher,
           channel: message.member.voice.channel,
         });
+        //If dispatcher is not speaking and not paused then the song is over.
         dispatcher.on("speaking", async (speaking) => {
           // console.log(`SPEAKING : ${speaking}`);
           // console.log(`PAUSED: ${dispatcher.paused}`);
@@ -58,13 +61,5 @@ export default class ReadyListener extends Listener {
         dispatcher.resume();
       }
     }
-  }
-
-  private getDispatcher(channel: VoiceChannel): StreamDispatcher | null {
-    let dispatcher: StreamDispatcher;
-    this.client.dispatchers.forEach((disp) => {
-      if (disp.channel.id === channel.id) dispatcher = disp.streamDispatcher;
-    });
-    return dispatcher;
   }
 }

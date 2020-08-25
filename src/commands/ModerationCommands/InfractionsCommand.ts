@@ -29,14 +29,21 @@ export default class InfractionsCommand extends Command {
     message: Message,
     { member }: { member: GuildMember }
   ): Promise<Message> {
+    //Check if member was given, if not send reply
+    if (!member)
+      return message.util.reply(
+        `Please spefify which member you would like to see the infractions for. `
+      );
+    //Get WarnsRepo
     const warnRepo: Repository<Warns> = this.client.db.getRepository(Warns);
+    //Get all Warns for mentioned member
     const warns: Warns[] = await warnRepo.find({
       user: member.id,
       guild: message.guild.id,
     });
-
+    //If no infractions found reply with message
     if (!warns.length) return message.util.reply("No infractions found.");
-
+    //Format infractions
     const infractions = await Promise.all(
       warns.map(async (v: Warns, i: number) => {
         const mod: User = await this.client.users
@@ -50,6 +57,7 @@ export default class InfractionsCommand extends Command {
           };
       })
     );
+    //Reply with infractions
     return message.util.send(
       new MessageEmbed()
         .setAuthor(

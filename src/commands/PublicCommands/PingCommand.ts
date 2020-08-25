@@ -16,6 +16,7 @@ export default class PingCommand extends Command {
   }
 
   public execute(message: Message): Promise<Message> {
+    //Send pong message with response time
     return message.util.send(`Pong! \`${this.client.ws.ping}ms\``);
   }
 }

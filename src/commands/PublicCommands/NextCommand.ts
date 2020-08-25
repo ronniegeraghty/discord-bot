@@ -19,39 +19,40 @@ export default class NextCommand extends Command {
   }
 
   public async execute(message: Message): Promise<Message> {
-    // Make sure member is in the voice channel
+    // Make sure member is in the voice channel, if not send reply
     if (!message.member.voice.channel) {
       message.util.reply(`You must be in a voice channel to use this command`);
     }
-    //Delete top song off music queue
+    //Get MusicQueueRepo
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
     );
+    //Find the music queue for the guild id (server)
     const musicQueue: MusicQueue[] = await musicQueueRepo.find({
       guild: message.guild.id,
     });
+    //Check if queue is empty, if so send reply
     if (!musicQueue.length) return message.util.reply("The queue is empty.");
+    //delete the first song in the queue
     await musicQueueRepo.delete(musicQueue[0]);
-    //Delete the dispatcher
-    let dispatcher = this.getDispatcher(message.member.voice.channel);
+    //Get Dispatcher for the voice channel
+    let dispatcher = this.client.getDispatcher(message.member.voice.channel);
+    //Check if there is a dispatcher, if not send reply
     if (!dispatcher)
       return message.util.reply(`Nothing is playing in your voice channel`);
     else {
+      //remove the dispatcher from client's dispatcher array
       this.client.dispatchers = this.client.dispatchers.filter(
         (disp) => disp.channel.id !== message.member.voice.channel.id
       );
+      //Destroy the dispatcher
       dispatcher.destroy();
     }
-    //emit play
-    this.client.emit("play", message);
+    //If there is not next sound in the queue send reply
     if (musicQueue.length === 1)
       return message.util.reply("You have reached the end of the queue");
-  }
-  private getDispatcher(channel: VoiceChannel): StreamDispatcher | null {
-    let dispatcher: StreamDispatcher;
-    this.client.dispatchers.forEach((disp) => {
-      if (disp.channel.id === channel.id) dispatcher = disp.streamDispatcher;
-    });
-    return dispatcher;
+
+    //emit play to play the next song in the queue
+    this.client.emit("play", message);
   }
 }

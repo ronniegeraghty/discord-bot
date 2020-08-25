@@ -32,25 +32,29 @@ export default class PlayCommand extends Command {
     message: Message,
     { url }: { url: URL }
   ): Promise<Message> {
+    //Get the Music Queue Repo
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
     );
+    //Get the music queue for current discord server
     const musicQueue: MusicQueue[] = await musicQueueRepo.find({
       guild: message.guild.id,
     });
-
+    //If no link included and their is no songs in the queue send reply
     if (!url && !musicQueue.length) {
       return message.util.send(`${message.member} you must include a link`);
     }
+    //If member not in a voice channel send reply
     if (!message.member.voice.channel) {
       return message.util.send(
         `${message.member} you must be in a voice channel to play music.`
       );
     }
+    //If a link was included add it to the MusicQueue
     if (url) {
       const videoTitle: string = (await ytdl.getBasicInfo(url.toString()))
         .videoDetails.title;
-
+      //insert song into music queue
       await musicQueueRepo.insert({
         guild: message.guild.id,
         user: message.author.id,
@@ -58,7 +62,7 @@ export default class PlayCommand extends Command {
         title: videoTitle,
       });
     }
-
+    //emit play event
     this.client.emit("play", message);
   }
 }

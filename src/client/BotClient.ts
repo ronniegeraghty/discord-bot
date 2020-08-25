@@ -10,8 +10,9 @@ declare module "discord-akairo" {
   interface AkairoClient {
     commandHanlder: CommandHandler;
     listenerHandler: ListenerHandler;
-    db: Connection;
-    dispatchers: Dispatcher[];
+    db: Connection; //Connection to Database
+    dispatchers: Dispatcher[]; //Array of dispatchers current active
+    getDispatcher: (channel: VoiceChannel) => StreamDispatcher | null; //Given a voice channel returns the respective dispatcher
   }
 }
 
@@ -79,6 +80,14 @@ export default class BotClient extends AkairoClient {
     await this.db.synchronize();
 
     this.dispatchers = [];
+
+    this.getDispatcher = (channel: VoiceChannel): StreamDispatcher | null => {
+      let dispatcher: StreamDispatcher;
+      this.dispatchers.forEach((disp) => {
+        if (disp.channel.id === channel.id) dispatcher = disp.streamDispatcher;
+      });
+      return dispatcher;
+    };
   }
 
   public async start(): Promise<string> {

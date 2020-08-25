@@ -29,9 +29,11 @@ export default class QueueCommand extends Command {
     message: Message,
     { clear }: { clear: boolean }
   ): Promise<Message> {
+    //Get the MusicQueueRepo
     const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
       MusicQueue
     );
+    //If clear flag, clear the music queue for this discord server and send reply
     if (clear) {
       musicQueueRepo
         .delete({
@@ -40,11 +42,15 @@ export default class QueueCommand extends Command {
         .then(() => {
           return message.util.reply(`The queue has been cleared.`);
         });
-    } else {
+    }
+    //If no flag send reply with the current queue
+    else {
       const musicQueue: MusicQueue[] = await musicQueueRepo.find({
         guild: message.guild.id,
       });
+      //If queue is emtpy send reply
       if (!musicQueue.length) return message.util.reply("The queue is empty");
+      //If queue has songs, send reply with songs
       return message.util.send(
         new MessageEmbed()
           .setAuthor(`Music Queue:`)
