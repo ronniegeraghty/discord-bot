@@ -2,10 +2,12 @@ import { Listener } from "discord-akairo";
 import { Message, StreamDispatcher, VoiceChannel } from "discord.js";
 import BotClient from "../../client/BotClient";
 import ytdl from "ytdl-core";
+import scdl from "soundcloud-downloader";
 import { AkairoClient } from "discord-akairo";
 import { MusicQueue } from "../../models/MusicQueue";
 import { Repository } from "typeorm";
 import { Speaking } from "discord.js";
+import { url } from "inspector";
 
 export default class ReadyListener extends Listener {
   public constructor() {
@@ -26,16 +28,27 @@ export default class ReadyListener extends Listener {
       guild: message.guild.id,
     });
     //Get the dispatcher for voice channel if there is one.
-    let dispatcher = this.client.getDispatcher(message.member.voice.channel);
+    let dispatcher: StreamDispatcher = this.client.getDispatcher(
+      message.member.voice.channel
+    );
     //If there was no dispatcher for voice channel create one.
     if (!dispatcher) {
       //If music queue is empty stop
       if (!musicQueue.length) return;
       //Connect to voice channel, play audio and add dispatcher to list
-      message.member.voice.channel.join().then((connection) => {
-        dispatcher = connection.play(
-          ytdl(musicQueue[0].url.toString(), { filter: "audioonly" })
-        );
+      message.member.voice.channel.join().then(async (connection) => {
+        let urlType: string = this.getURLType(musicQueue[0].url);
+        if (urlType === "youtube") {
+          dispatcher = connection.play(
+            ytdl(musicQueue[0].url.toString(), { filter: "audioonly" })
+          );
+        }
+        if (urlType === "soundcloud") {
+          await scdl.download(musicQueue[0].url.toString()).then((stream) => {
+            dispatcher = connection.play(stream);
+          });
+        }
+
         //If new dispatcher, add to client.dispatchers
         this.client.dispatchers.push({
           streamDispatcher: dispatcher,
@@ -60,6 +73,18 @@ export default class ReadyListener extends Listener {
       if (paused) {
         dispatcher.resume();
       }
+    }
+  }
+  public getURLType(url: URL): string {
+    let urlString: string = url.toString();
+    let comIndex: number = urlString.indexOf(".com");
+    switch (urlString.substring(0, comIndex)) {
+      case "https://www.youtube":
+        return "youtube";
+      case "https://soundcloud":
+        return "soundcloud";
+      default:
+        return null;
     }
   }
 }

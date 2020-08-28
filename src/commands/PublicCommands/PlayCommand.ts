@@ -1,6 +1,7 @@
 import Command from "../../client/Command";
 import { Message } from "discord.js";
 import ytdl from "ytdl-core";
+import scdl from "soundcloud-downloader";
 import { Repository } from "typeorm";
 import { MusicQueue } from "../../models/MusicQueue";
 
@@ -10,13 +11,10 @@ export default class PlayCommand extends Command {
       aliases: ["play"],
       category: "Public Commands",
       description: {
-        content: "Play music from youtube, or resume the paused music",
+        content:
+          "Play music from youtube and soundcloud, or resume the paused music",
         useage: "play [ youtube link ]",
-        examples: [
-          "play https://www.youtube.com/watch?v=5aopMm7UGYA",
-          "play https://www.youtube.com/watch?v=YjYHXGCFZWo",
-          "play",
-        ],
+        examples: ["play <youtube_or_soundcloud_link>", "play"],
       },
       ratelimit: 3,
       args: [
@@ -52,17 +50,36 @@ export default class PlayCommand extends Command {
     }
     //If a link was included add it to the MusicQueue
     if (url) {
-      const videoTitle: string = (await ytdl.getBasicInfo(url.toString()))
-        .videoDetails.title;
+      let urlType: string = this.getURLType(url);
+      let musicTitle: string;
+      if (urlType === "youtube") {
+        musicTitle = (await ytdl.getBasicInfo(url.toString())).videoDetails
+          .title;
+      }
+      if (urlType === "soundcloud") {
+        musicTitle = (await scdl.getInfo(url.toString())).title;
+      }
       //insert song into music queue
       await musicQueueRepo.insert({
         guild: message.guild.id,
         user: message.author.id,
         url: url,
-        title: videoTitle,
+        title: musicTitle,
       });
     }
     //emit play event
     this.client.emit("play", message);
+  }
+  public getURLType(url: URL): string {
+    let urlString: string = url.toString();
+    let comIndex: number = urlString.indexOf(".com");
+    switch (urlString.substring(0, comIndex)) {
+      case "https://www.youtube":
+        return "youtube";
+      case "https://soundcloud":
+        return "soundcloud";
+      default:
+        return null;
+    }
   }
 }
