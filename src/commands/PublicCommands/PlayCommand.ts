@@ -59,8 +59,7 @@ export default class PlayCommand extends Command {
               .title;
             break;
           case "soundcloud":
-            musicTitle = (await ytdl.getBasicInfo(url.toString())).videoDetails
-              .title;
+            musicTitle = (await scdl.getInfo(url.toString())).title;
             break;
           default:
             return this.sendNotValidLink(message);
