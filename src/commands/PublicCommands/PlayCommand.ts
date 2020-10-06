@@ -40,7 +40,7 @@ export default class PlayCommand extends Command {
     });
     //If no link included and their is no songs in the queue send reply
     if (!url && !musicQueue.length) {
-      return message.util.send(`${message.member} you must include a link`);
+      return this.sendNotValidLink(message);
     }
     //If member not in a voice channel send reply
     if (!message.member.voice.channel) {
@@ -52,13 +52,22 @@ export default class PlayCommand extends Command {
     if (url) {
       let urlType: string = this.getURLType(url);
       let musicTitle: string;
-      if (urlType === "youtube") {
-        musicTitle = (await ytdl.getBasicInfo(url.toString())).videoDetails
-          .title;
+      try {
+        switch (urlType) {
+          case "youtube":
+            musicTitle = (await ytdl.getBasicInfo(url.toString())).videoDetails
+              .title;
+            break;
+          case "soundcloud":
+            musicTitle = (await scdl.getInfo(url.toString())).title;
+            break;
+          default:
+            return this.sendNotValidLink(message);
+        }
+      } catch (error) {
+        return this.sendNotValidLink(message);
       }
-      if (urlType === "soundcloud") {
-        musicTitle = (await scdl.getInfo(url.toString())).title;
-      }
+
       //insert song into music queue
       await musicQueueRepo.insert({
         guild: message.guild.id,
@@ -81,5 +90,9 @@ export default class PlayCommand extends Command {
       default:
         return null;
     }
+  }
+
+  public sendNotValidLink(message: Message): Promise<Message> {
+    return message.util.reply("Please use a valid youtube or soundcloud link.");
   }
 }
