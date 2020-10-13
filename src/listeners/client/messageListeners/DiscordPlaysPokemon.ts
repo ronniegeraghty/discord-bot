@@ -5,11 +5,7 @@ import { execSync } from "child_process";
 export default async (listener: Listener, message: Message) => {
   let serverName: string = message.guild.name;
   let author: string = message.author.username;
-
-  let commands: string[] = message.content.split(" ");
-  if (commands.length > 3) {
-    commands = commands.slice(0, 3);
-  }
+  let commands: string[] = parseCommands(message.content);
   commands.forEach(async (command) => {
     await handleCommand(command);
   });
@@ -17,7 +13,6 @@ export default async (listener: Listener, message: Message) => {
   function logMessage(controlerInput: string) {
     console.log(`${serverName}: ${author}: ${controlerInput}`);
   }
-
   async function handleCommand(command: string) {
     if (command === "DPP_ON" && author === "ronniegerag") {
       listener.client.DPP = true;
@@ -99,4 +94,13 @@ function keyPress(key: string) {
   execSync(
     `python ./src/listeners/client/messageListeners/keyboardPress.py ${key}`
   );
+}
+
+function parseCommands(commandStr: string): string[] {
+  let commandArr = commandStr.split(" ");
+
+  if (commandArr.length > 3) {
+    commandArr = commandArr.slice(0, 3);
+  }
+  return commandArr;
 }
