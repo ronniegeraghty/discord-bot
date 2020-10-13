@@ -98,7 +98,7 @@ function keyPress(key: string) {
 
 function parseCommands(commandStr: string): string[] {
   let commandArr = commandStr.split(" ");
-
+  for (let i = 0; i < commandArr.length - 1; i++) {}
   if (commandArr.length > 3) {
     commandArr = commandArr.slice(0, 3);
   }
