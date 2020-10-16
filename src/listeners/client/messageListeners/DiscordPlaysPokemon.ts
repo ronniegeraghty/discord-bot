@@ -2,6 +2,7 @@ import { Listener } from "discord-akairo";
 import { Message } from "discord.js";
 import _ from "lodash";
 import { execSync } from "child_process";
+import { commandList, commandControlMap } from "./DPPCommands";
 export default async (listener: Listener, message: Message) => {
   let serverName: string = message.guild.name;
   let author: string = message.author.username;
@@ -11,19 +12,13 @@ export default async (listener: Listener, message: Message) => {
   });
 };
 
-function keyPress(key: string) {
-  execSync(
-    `python ./src/listeners/client/messageListeners/keyboardPress.py ${key}`
-  );
-}
-
 function parseCommands(commandStr: string): string[] {
   let commandArr = commandStr.split(" "); //parse commands by spaces
   let comArrLen = commandArr.length;
   //find commands with direction then number and make them one command
   let newCommandArr: string[] = [];
   for (let i = 0; i < comArrLen - 1; i++) {
-    if (isDirectionCommand(commandArr[i]) && isNumeric(commandArr[i + 1])) {
+    if (isNumeric(commandArr[i + 1])) {
       newCommandArr.push(commandArr[i] + " " + commandArr[i + 1]);
       i++;
     } else {
@@ -72,68 +67,62 @@ async function handleCommand(
   }
   if (_.toLower(command) === "help") {
     return await message.reply(
-      `Use this channel to submit GameBoy control commands to the Discord Plays Pokemon System. Multiple commands can be use by seperating them with a space.` +
+      `Use this channel to submit GameBoy control commands to the Discord Plays Pokemon System. ` +
+        `Multiple commands can be use by seperating them with a space. \n**ex: up down right**\n` +
+        `Adding a number behind a command will execute that command that many times. \n**ex: up 5**\n` +
+        `The max number is 10.` +
         `\n**GameBoy Commands:**` +
-        `\n**up:** up on D-pad` +
-        `\n**down:** down on D-pad` +
-        `\n**right:** right on D-pad` +
-        `\n**left:** left on D-pad` +
+        `\n**up, u:** up on D-pad` +
+        `\n**down, d:** down on D-pad` +
+        `\n**right, r:** right on D-pad` +
+        `\n**left, l:** left on D-pad` +
         `\n**a:** A button` +
         `\n**b:** B button` +
         `\n**start:** Start button` +
         `\n**select:** Select button` +
-        `\n**r:** Right trigger` +
-        `\n**l:** Left trigger`
+        `\n**rt:** Right trigger` +
+        `\n**lt:** Left trigger`
     );
   }
-  let logCom = (com: string) => logMessage(serverName, author, com);
+
+  let comArr: string[] = command.split(" ");
+  comArr[0] = _.toLower(comArr[0]);
   if (listener.client.DPP && author !== "Ron_Bot") {
-    switch (_.toLower(command.trim())) {
-      case "up":
-        logCom("UP");
-        keyPress("up");
-        break;
-      case "down":
-        logCom("DOWN");
-        keyPress("down");
-        break;
-      case "right":
-        logCom("RIGHT");
-        keyPress("right");
-        break;
-      case "left":
-        logCom("LEFT");
-        keyPress("left");
-        break;
-      case "a":
-        logCom("A");
-        keyPress("a");
-        break;
-      case "b":
-        logCom("B");
-        keyPress("b");
-        break;
-      case "start":
-        logCom("START");
-        keyPress("z");
-        break;
-      case "select":
-        logCom("SELECT");
-        keyPress("x");
-        break;
-      case "r":
-        logCom("RIGHT TRIGGER");
-        keyPress("r");
-        break;
-      case "l":
-        logCom("LEFT TRIGGER");
-        keyPress("l");
-        break;
-      default:
-        logCom(`\"${command}\" is not a valid option.`);
-        break;
+    execCommand(comArr, serverName, author);
+  }
+}
+
+function handleNumMultiplier(comArr: string[]): number {
+  if (comArr[1]) {
+    let multiplier: number = Number(comArr[1]);
+    if (multiplier) {
+      if (multiplier > 10) multiplier = 10;
+      else if (multiplier < 1) multiplier = 1;
+      return multiplier;
+    }
+    return 1;
+  }
+  return 1;
+}
+
+function execCommand(comArr: string[], serverName: string, author: string) {
+  if (!commandList[comArr[0]]) {
+    logMessage(serverName, author, `${comArr[0]} is not a valid command.`);
+    return;
+  } else {
+    let multipler: number = handleNumMultiplier(comArr);
+    let command: string = commandControlMap[commandList[comArr[0]]];
+    for (let i = 0; i < multipler; i++) {
+      logMessage(serverName, author, commandList[comArr[0]]);
+      keyPress(command);
     }
   }
+}
+
+function keyPress(key: string) {
+  execSync(
+    `python ./src/listeners/client/messageListeners/keyboardPress.py ${key}`
+  );
 }
 
 function logMessage(
