@@ -3,6 +3,7 @@ import { Message } from "discord.js";
 import _ from "lodash";
 import { execSync } from "child_process";
 import { commandList, commandControlMap } from "./DPPCommands";
+import { emit } from "process";
 export default async (listener: Listener, message: Message) => {
   let serverName: string = message.guild.name;
   let author: string = message.author.username;
@@ -64,6 +65,17 @@ async function handleCommand(
     listener.client.DPP = false;
     console.log(`DPP SYSTEM OFF`);
     return await message.reply(`DISCORD PLAYS POKEMON SYSTEM OFF.`);
+  }
+  if (command === "RANDOM_ON" && author === "ronniegerag") {
+    listener.client.DPP_RANDOM = true;
+    listener.client.emit("dpp_random");
+    console.log(`DPP RANDOM ON`);
+    return await message.reply(`DPP RANDOM ON.`);
+  }
+  if (command === "RANDOM_OFF" && author === "ronniegerag") {
+    listener.client.DPP_RANDOM = false;
+    return await message.reply(`DPP RANDOM OFF.`);
+    console.log(`DPP RANDOM OFF`);
   }
   if (_.toLower(command) === "help") {
     return await message.reply(
