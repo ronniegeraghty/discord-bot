@@ -13,6 +13,8 @@ declare module "discord-akairo" {
     db: Connection; //Connection to Database
     dispatchers: Dispatcher[]; //Array of dispatchers current active
     getDispatcher: (channel: VoiceChannel) => StreamDispatcher | null; //Given a voice channel returns the respective dispatcher
+    DPP: boolean; //Whether Discord Plays Pokemon feature is activated or not.
+    DPP_RANDOM: boolean; //Whether to have Discord Play Pokemon do random commands
   }
 }
 
@@ -30,6 +32,8 @@ export default class BotClient extends AkairoClient {
   public config: BotOptions;
   public db!: Connection;
   public dispatchers!: Dispatcher[];
+  public DPP: boolean = false;
+  public DPP_RANDOM: boolean = false;
   public listenerHandler: ListenerHandler = new ListenerHandler(this, {
     directory: join(__dirname, "..", "listeners"),
   });
