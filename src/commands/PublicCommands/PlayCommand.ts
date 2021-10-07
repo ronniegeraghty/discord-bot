@@ -4,6 +4,7 @@ import ytdl from "ytdl-core";
 import scdl from "soundcloud-downloader";
 import { Repository } from "typeorm";
 import { MusicQueue } from "../../models/MusicQueue";
+import { isContext } from "vm";
 
 export default class PlayCommand extends Command {
   public constructor() {
@@ -65,6 +66,7 @@ export default class PlayCommand extends Command {
             return this.sendNotValidLink(message);
         }
       } catch (error) {
+        console.log(`ERROR: ${error}`);
         return this.sendNotValidLink(message);
       }
 

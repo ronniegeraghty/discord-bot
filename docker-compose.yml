@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  discord-bot:
+    container_name: discord-bot
+    restart: always
+    networks:
+      - api_server_default
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: discord-bot:1.0.0
+networks:
+  api_server_default:
+    driver: bridge
