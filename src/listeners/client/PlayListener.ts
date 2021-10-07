@@ -7,7 +7,6 @@ import { AkairoClient } from "discord-akairo";
 import { MusicQueue } from "../../models/MusicQueue";
 import { Repository } from "typeorm";
 import { Speaking } from "discord.js";
-import { url } from "inspector";
 
 export default class ReadyListener extends Listener {
   public constructor() {
