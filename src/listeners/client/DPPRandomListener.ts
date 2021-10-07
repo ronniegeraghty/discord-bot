@@ -42,7 +42,7 @@ export default class DPPRandomListener extends Listener {
         logMessage("BOT-SERVER", "Ron_Bot", "START");
         keyPress("z");
       }
-      setTimeout(() => this.client.emit("dpp_random"), 500);
+      setTimeout(() => this.client.emit("dpp_random"), 10);
     }
   }
 }
