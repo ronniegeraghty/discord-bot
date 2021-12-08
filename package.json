@@ -2,11 +2,11 @@
   "name": "discord_bot",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./build/Bot.js",
   "scripts": {
     "start": "node ./build/Bot.js",
     "build": "tsc",
-    "dev": "concurrently \"tsc -w\" \"nodemon ./build/Bot.js --trace-warnings\"",
+    "dev": "nodemon ./src/Bot.ts",
     "config-sys": "node config-sys/config-sys.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -29,6 +29,7 @@
   "devDependencies": {
     "concurrently": "^5.3.0",
     "nodemon": "^2.0.4",
+    "ts-node": "^10.4.0",
     "typescript": "^3.9.7"
   }
 }

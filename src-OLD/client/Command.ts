@@ -1,29 +1,26 @@
 import {
-  ArgumentOptions,
-  ArgumentGenerator,
   Command as AkairoCommand,
   CommandOptions,
+  ArgumentOptions,
+  ArgumentGenerator,
 } from "discord-akairo";
 import { Message } from "discord.js";
 import { helpVerbos } from "./Help";
 
 export default class Command extends AkairoCommand {
   public constructor(id: string, options: CommandOptions) {
-    //Default -help flag to add to every command
+    // Default -help flag to add to every command
     let helpOptions: ArgumentOptions = {
       id: "help",
       match: "flag",
       flag: "-help",
     };
     let argsObjArr: ArgumentOptions[] = addObj(options.args, helpOptions);
-    super(id, {
-      ...options,
-      args: argsObjArr,
-    });
+    super(id, { ...options, args: argsObjArr });
   }
-  //New method to use to say what happends when a command is called.
+  //New method to use to say what happens when a Command is called.
   public execute?(message: Message, args: any): any;
-  //Set up to see if help flag was used, if so don't execute the command just sned the message with the command description
+  //Set up to see if help flag was used, if so don't execute the command just send message with command description
   public exec(message: Message, args: any) {
     if (args.help) return message.util.send(helpVerbos(this));
     else {

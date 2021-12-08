@@ -6,7 +6,7 @@ import { Command } from "discord-akairo";
  * @returns {string} The Command ID followed by the description content
  */
 export function help(command: Command): string {
-  return `**${command.id}** ${command.description.content}\n`;
+  return `**${command.id}**: ${command.description.content}\n`;
 }
 
 /**
@@ -25,7 +25,7 @@ export function helpVerbos(command: Command): string {
     content = content + flags;
   }
   let example: string = command.description.examples
-    .map((ex) => `\t${ex}\n`)
+    .map((ex) => `\t-${ex}\n`)
     .join("");
   content = content + `Examples:\n` + example;
   return content;
