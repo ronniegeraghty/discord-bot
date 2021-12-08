@@ -2,4 +2,5 @@
 node_modules
 build
 src/Config.ts
+src-OLD/Config.ts
 db.sqlite
