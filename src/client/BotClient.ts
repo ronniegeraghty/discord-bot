@@ -1,6 +1,6 @@
 import { join } from "path";
 import fs from "fs";
-import { Client, ClientOptions, Collection, Intents } from "discord.js";
+import { Client, ClientOptions, Collection } from "discord.js";
 import Command, { CommandAbs } from "./Command";
 
 export default class BotClient extends Client {
@@ -12,18 +12,21 @@ export default class BotClient extends Client {
     this.commands = new Collection<string, Command>();
   }
   public start() {
+    console.log("Starting Bot");
     this.init();
     this.login(this.token);
   }
   public init() {
+    console.log("Initializing Bot");
     this.loadCommands();
     this.loadEventListeners();
   }
   public loadCommands() {
     const commandPath = join(__dirname, "..", "commands");
+    console.log(`Loading Commands`);
     const commandFiles = fs
       .readdirSync(commandPath)
-      .filter((file) => file.endsWith(".ts"));
+      .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of commandFiles) {
       import(`../commands/${file}`).then(
         (dflt: { default: Command | CommandAbs }) => {
@@ -58,10 +61,11 @@ export default class BotClient extends Client {
     });
   }
   public loadEventListeners() {
+    console.log("Loading Event Listeners");
     const eventPath = join(__dirname, "..", "events");
     const eventFiles = fs
       .readdirSync(eventPath)
-      .filter((file) => file.endsWith(".ts"));
+      .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of eventFiles) {
       import(`../events/${file}`).then((event) => {
         console.log(`➕ Adding Event Listener: ${event.name}`);
