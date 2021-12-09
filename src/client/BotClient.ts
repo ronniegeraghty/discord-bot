@@ -1,7 +1,7 @@
 import { join } from "path";
 import fs from "fs";
 import { Client, ClientOptions, Collection, Intents } from "discord.js";
-import Command from "./Command";
+import Command, { CommandAbs } from "./Command";
 
 export default class BotClient extends Client {
   public token: string;
@@ -25,11 +25,13 @@ export default class BotClient extends Client {
       .readdirSync(commandPath)
       .filter((file) => file.endsWith(".ts"));
     for (const file of commandFiles) {
-      import(`../commands/${file}`).then((dflt: { default: Command }) => {
-        const command = dflt.default;
-        this.commands.set(command.data.name, command);
-        console.log(`➕ Adding Command: ${command.data.name}`);
-      });
+      import(`../commands/${file}`).then(
+        (dflt: { default: Command | CommandAbs }) => {
+          const command = dflt.default;
+          this.commands.set(command.data.name, command);
+          console.log(`➕ Adding Command: ${command.data.name}`);
+        }
+      );
     }
     this.on("interactionCreate", async (interaction) => {
       if (!interaction.isCommand()) return;
