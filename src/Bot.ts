@@ -50,6 +50,22 @@ client.on("interactionCreate", async (interaction) => {
   }
 });
 
+//Import Event listeners
+const eventPath = join(__dirname, "events");
+const eventFiles = fs
+  .readdirSync(eventPath)
+  .filter((file) => file.endsWith(".ts"));
+
+for (const file of eventFiles) {
+  import(`./events/${file}`).then((event) => {
+    if (event.once) {
+      client.once(event.name, (...args) => event.execute(...args));
+    } else {
+      client.on(event.name, (...args) => event.execute(...args));
+    }
+  });
+}
+
 //When the client is ready, run this code(only once)
 client.once("ready", () => {
   console.log(`${client.user.tag} is Ready!`);
