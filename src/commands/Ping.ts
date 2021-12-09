@@ -1,9 +1,14 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-module.exports = {
+import Command from "../client/Command";
+
+const Ping: Command = {
   data: new SlashCommandBuilder()
     .setName("ping")
     .setDescription("Replies with pong, checks latency of server."),
-  async execute(interaction) {
-    await interaction.reply(`Pong! - ${interaction.client.ws.ping}ms`);
+  execute: async (interaction) => {
+    if (interaction.isCommand()) {
+      await interaction.reply(`Pong! - ${interaction.client.ws.ping}ms`);
+    }
   },
 };
+export default Ping;

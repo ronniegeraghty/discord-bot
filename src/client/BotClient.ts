@@ -25,8 +25,10 @@ export default class BotClient extends Client {
       .readdirSync(commandPath)
       .filter((file) => file.endsWith(".ts"));
     for (const file of commandFiles) {
-      import(`../commands/${file}`).then((command) => {
+      import(`../commands/${file}`).then((dflt: { default: Command }) => {
+        const command = dflt.default;
         this.commands.set(command.data.name, command);
+        console.log(`➕ Adding Command: ${command.data.name}`);
       });
     }
     this.on("interactionCreate", async (interaction) => {
@@ -34,8 +36,11 @@ export default class BotClient extends Client {
       const command = this.commands.get(interaction.commandName);
       if (!command) return;
       try {
-        await command.execute(interaction);
+        command.execute(interaction);
       } catch (error) {
+        console.error(
+          `Error executing command: ${interaction.commandName} - Error: ${error}`
+        );
         await interaction.reply({
           content: "There was an error while executing this command!",
           ephemeral: true,
@@ -50,6 +55,7 @@ export default class BotClient extends Client {
       .filter((file) => file.endsWith(".ts"));
     for (const file of eventFiles) {
       import(`../events/${file}`).then((event) => {
+        console.log(`➕ Adding Event Listener: ${event.name}`);
         if (event.once) {
           this.once(event.name, (...args) => event.execute(...args));
         } else {
