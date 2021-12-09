@@ -1,8 +1,6 @@
-import fs from "fs";
-import { join } from "path";
-import { Collection, Intents } from "discord.js";
 import { token } from "./config.json";
 import BotClient from "./client/BotClient";
+import { Intents } from "discord.js";
 
 // Create instance of client
 const client = new BotClient(token, { intents: [Intents.FLAGS.GUILDS] });

@@ -7,7 +7,7 @@ export default class BotClient extends Client {
   public token: string;
   public commands: Collection<string, Command>;
   public constructor(token: string, options: ClientOptions) {
-    super({ intents: [Intents.FLAGS.GUILDS] });
+    super(options);
     this.token = token;
     this.commands = new Collection<string, Command>();
   }
@@ -37,6 +37,13 @@ export default class BotClient extends Client {
       if (!interaction.isCommand()) return;
       const command = this.commands.get(interaction.commandName);
       if (!command) return;
+      console.log(
+        `Command Triggered: ${interaction.user.tag} triggered Command: ${
+          command.data.name
+        }, on Server: ${interaction.guild.name} in channel #${
+          interaction.guild.channels.cache.get(interaction.channelId).name
+        }\n - ${interaction}`
+      );
       try {
         command.execute(interaction);
       } catch (error) {
