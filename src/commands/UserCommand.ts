@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Interaction, MessageActionRow, MessageEmbed } from "discord.js";
+import { Interaction, MessageEmbed } from "discord.js";
 import { CommandAbs } from "../client/Command";
 
 class UserCommand extends CommandAbs {
