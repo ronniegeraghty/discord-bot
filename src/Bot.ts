@@ -1,5 +1,9 @@
-import { token, owners } from "./Config";
+import { token } from "./config.json";
 import BotClient from "./client/BotClient";
+import { Intents } from "discord.js";
 
-const client: BotClient = new BotClient({ token, owners });
+// Create instance of client
+const client = new BotClient(token, { intents: [Intents.FLAGS.GUILDS] });
+
+// Login to Discord with your client's token
 client.start();

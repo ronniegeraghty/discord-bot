@@ -2,7 +2,6 @@ import Command from "../../client/Command";
 import { Message, VoiceChannel, StreamDispatcher } from "discord.js";
 import { Repository } from "typeorm";
 import { MusicQueue } from "../../models/MusicQueue";
-import { memory } from "console";
 
 export default class NextCommand extends Command {
   public constructor() {
@@ -24,9 +23,8 @@ export default class NextCommand extends Command {
       message.util.reply(`You must be in a voice channel to use this command`);
     }
     //Get MusicQueueRepo
-    const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
-      MusicQueue
-    );
+    const musicQueueRepo: Repository<MusicQueue> =
+      this.client.db.getRepository(MusicQueue);
     //Find the music queue for the guild id (server)
     const musicQueue: MusicQueue[] = await musicQueueRepo.find({
       guild: message.guild.id,
