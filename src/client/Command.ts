@@ -23,14 +23,12 @@ export default class Command extends BaseCommand {
     this.execute = options.execute;
   }
 }
-export abstract class CommandAbs extends BaseCommand {
-  public constructor(options: CommandOptions) {
-    super(options);
-  }
+export abstract class CommandAbs {
+  abstract data: SlashCommandBuilder;
   abstract execute(interaction: Interaction): void;
 }
 
 export type CommandType = {
-  data: SlashCommandBuilder;
+  data: any;
   execute: (Interaction: Interaction) => void;
 };

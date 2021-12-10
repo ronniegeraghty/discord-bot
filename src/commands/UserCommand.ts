@@ -1,13 +1,11 @@
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { Interaction } from "discord.js";
 import { CommandAbs } from "../client/Command";
 
 class UserCommand extends CommandAbs {
-  public constructor() {
-    super({
-      name: "user",
-      description: "Replies with user info.",
-    });
-  }
+  public data = new SlashCommandBuilder()
+    .setName("user")
+    .setDescription("Replies with user info.");
   public async execute(interaction: Interaction): Promise<void> {
     if (interaction.isCommand()) {
       await interaction.reply(
