@@ -4,7 +4,6 @@ import { Client, ClientOptions, Collection } from "discord.js";
 import Command, { CommandAbs } from "./Command";
 import mongoose from "mongoose";
 import { DatabaseOptions } from "../database/DatabaseOptions.type";
-import Guild from "../database/schemas/Guilds";
 
 export default class BotClient extends Client {
   public token: string;
