@@ -2,13 +2,22 @@ import { join } from "path";
 import fs from "fs";
 import { Client, ClientOptions, Collection } from "discord.js";
 import Command, { CommandAbs } from "./Command";
+import mongoose from "mongoose";
+import { DatabaseOptions } from "../database/DatabaseOptions.type";
+import Guild from "../database/schemas/Guilds";
 
 export default class BotClient extends Client {
   public token: string;
+  public dbOptions: DatabaseOptions;
   public commands: Collection<string, Command>;
-  public constructor(token: string, options: ClientOptions) {
+  public constructor(
+    token: string,
+    dbOptions: DatabaseOptions,
+    options: ClientOptions
+  ) {
     super(options);
     this.token = token;
+    this.dbOptions = dbOptions;
     this.commands = new Collection<string, Command>();
   }
   public start() {
@@ -20,8 +29,9 @@ export default class BotClient extends Client {
     console.log("Initializing Bot");
     this.loadCommands();
     this.loadEventListeners();
+    this.connectDatabase();
   }
-  public loadCommands() {
+  private loadCommands() {
     const commandPath = join(__dirname, "..", "commands");
     console.log(`Loading Commands`);
     const commandFiles = fs
@@ -60,7 +70,7 @@ export default class BotClient extends Client {
       }
     });
   }
-  public loadEventListeners() {
+  private loadEventListeners() {
     console.log("Loading Event Listeners");
     const eventPath = join(__dirname, "..", "events");
     const eventFiles = fs
@@ -76,5 +86,15 @@ export default class BotClient extends Client {
         }
       });
     }
+  }
+  private connectDatabase() {
+    mongoose.connect(
+      `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`,
+      {},
+      (err: Error) => {
+        if (err) throw err;
+        console.log(`Connected to MongoDB`);
+      }
+    );
   }
 }
