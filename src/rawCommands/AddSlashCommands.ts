@@ -4,6 +4,7 @@ import SubscribedGuild, {
   SubscribedGuildInterface,
 } from "../database/schemas/SubscribedGuilds";
 import { Error } from "mongoose";
+import { refreshCommandsForGuild } from "../DeployCommands";
 
 class AddSlashCommands extends RawCommand {
   public constructor() {
@@ -30,7 +31,7 @@ class AddSlashCommands extends RawCommand {
             "Server now subscribed to slash commands. Uploading slash commands to server ... "
           );
         }
-        this.refreshSlashCommands(guildId).then(() => {
+        refreshCommandsForGuild({ guildId: guildId }).then(() => {
           replyMessage.then((resolvedReply) => {
             const { content } = resolvedReply;
             resolvedReply.edit(
@@ -41,9 +42,6 @@ class AddSlashCommands extends RawCommand {
         });
       }
     );
-  }
-  private refreshSlashCommands(guildId: string): Promise<boolean> {
-    return new Promise((resolve) => setTimeout(resolve, 5000));
   }
 }
 export default new AddSlashCommands();
