@@ -1,23 +1,28 @@
 import { join } from "path";
 import fs from "fs";
-import { Client, ClientOptions, Collection } from "discord.js";
-import Command, { CommandAbs } from "./Command";
+import { Client, ClientOptions, Collection, Message } from "discord.js";
+import { COMMANDS, RawCommand, RawCommandOptions } from "./Command";
 import mongoose from "mongoose";
 import { DatabaseOptions } from "../database/DatabaseOptions.type";
 
 export default class BotClient extends Client {
   public token: string;
   public dbOptions: DatabaseOptions;
-  public commands: Collection<string, Command>;
+  public commands: Collection<string, COMMANDS>;
+  public rawCommands: Collection<string, RawCommand>;
+  public rawCommandOptions: RawCommandOptions;
   public constructor(
     token: string,
     dbOptions: DatabaseOptions,
+    rawCommandOptions: RawCommandOptions,
     options: ClientOptions
   ) {
     super(options);
     this.token = token;
     this.dbOptions = dbOptions;
-    this.commands = new Collection<string, Command>();
+    this.commands = new Collection<string, COMMANDS>();
+    this.rawCommands = new Collection<string, RawCommand>();
+    this.rawCommandOptions = rawCommandOptions;
   }
   public start() {
     console.log("Starting Bot");
@@ -27,6 +32,7 @@ export default class BotClient extends Client {
   public init() {
     console.log("Initializing Bot");
     this.loadCommands();
+    this.loadRawCommands();
     this.loadEventListeners();
     this.connectDatabase();
   }
@@ -36,15 +42,15 @@ export default class BotClient extends Client {
     const commandFiles = fs
       .readdirSync(commandPath)
       .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
+    //import commands and add to commands property
     for (const file of commandFiles) {
-      import(`../commands/${file}`).then(
-        (dflt: { default: Command | CommandAbs }) => {
-          const command = dflt.default;
-          this.commands.set(command.data.name, command);
-          console.log(`➕ Adding Command: ${command.data.name}`);
-        }
-      );
+      import(`../commands/${file}`).then((dflt: { default: COMMANDS }) => {
+        const command = dflt.default;
+        this.commands.set(command.data.name, command);
+        console.log(`➕ Adding Command: ${command.data.name}`);
+      });
     }
+    //add listener for slash command
     this.on("interactionCreate", async (interaction) => {
       if (!interaction.isCommand()) return;
       const command = this.commands.get(interaction.commandName);
@@ -56,6 +62,7 @@ export default class BotClient extends Client {
           interaction.guild.channels.cache.get(interaction.channelId).name
         }\n - ${interaction}`
       );
+      //Try executing command
       try {
         command.execute(interaction);
       } catch (error) {
@@ -66,6 +73,51 @@ export default class BotClient extends Client {
           content: "There was an error while executing this command!",
           ephemeral: true,
         });
+      }
+    });
+  }
+  private async loadRawCommands() {
+    const rawCommandPath = join(__dirname, "..", "rawCommands");
+    console.log(`Loading Raw Commands`);
+    const rawCommandFiles = fs
+      .readdirSync(rawCommandPath)
+      .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
+    //import raw command and to raw commands property
+    for (const file of rawCommandFiles) {
+      await import(`../rawCommands/${file}`).then(
+        (dflt: { default: RawCommand }) => {
+          const rawCommand = dflt.default;
+          this.rawCommands.set(rawCommand.name, rawCommand);
+          console.log(`➕ Adding Raw Command: ${rawCommand.name}`);
+        }
+      );
+    }
+    //Add listener of raw commands
+    this.on("messageCreate", async (message: Message) => {
+      if (message.content[0] === this.rawCommandOptions.prefix) {
+        const args: string[] = message.content.split(" ");
+        const rawCommand: RawCommand = this.rawCommands.get(
+          args[0].substring(1)
+        );
+        if (rawCommand) {
+          console.log(
+            `Raw Command Triggered: ${
+              message.author.tag
+            } triggered Raw Command: ${rawCommand.name}, on Server: ${
+              message.guild.name
+            } in channel #${
+              message.guild.channels.cache.get(message.channelId).name
+            }\n - ${message.content} `
+          );
+          //Try executing command
+          try {
+            rawCommand.execute(message);
+          } catch (error) {
+            console.error(
+              `Error executing command: ${rawCommand.name} - Message: ${message.content} - Error: ${error}`
+            );
+          }
+        }
       }
     });
   }
