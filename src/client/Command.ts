@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Interaction } from "discord.js";
+import { Interaction, Message } from "discord.js";
 
 export type CommandOptions = {
   name: string;
@@ -32,3 +32,17 @@ export type CommandType = {
   data: any;
   execute: (Interaction: Interaction) => void;
 };
+
+export abstract class RawCommand {
+  public name: string;
+  public constructor(name: string) {
+    this.name = name;
+  }
+  abstract execute(message: Message): void;
+}
+
+export type RawCommandOptions = {
+  prefix: string;
+};
+
+export type COMMANDS = Command | CommandAbs | CommandType;
