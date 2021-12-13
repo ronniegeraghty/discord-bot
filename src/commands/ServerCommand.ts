@@ -6,12 +6,10 @@ class ServerCommand extends Command {
     super({
       name: "server",
       description: "Replies with server info.",
-      execute: async (interaction: Interaction) => {
-        if (interaction.isCommand()) {
-          await interaction.reply(
-            `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
-          );
-        }
+      execute: async (interaction) => {
+        await interaction.reply(
+          `Server name: ${interaction.guild.name}\nTotal members: ${interaction.guild.memberCount}`
+        );
       },
     });
   }
