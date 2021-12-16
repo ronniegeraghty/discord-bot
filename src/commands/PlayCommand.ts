@@ -1,9 +1,22 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { GuildMember } from "discord.js";
+import {
+  CommandInteraction,
+  GuildMember,
+  InteractionCollector,
+  StageChannel,
+  VoiceChannel,
+} from "discord.js";
 import { CommandType } from "../client/Command";
 import ytdl from "ytdl-core";
 import scdl from "soundcloud-downloader";
-import MusicQueue from "../database/schemas/MusicQueue";
+import BotClient from "../client/BotClient";
+import MusicSubscription from "../client/Subscription";
+import {
+  entersState,
+  joinVoiceChannel,
+  VoiceConnectionStatus,
+} from "@discordjs/voice";
+import Track from "../client/Track";
 
 const PlayCommand: CommandType = {
   data: new SlashCommandBuilder()
@@ -24,8 +37,8 @@ const PlayCommand: CommandType = {
       return;
     }
     //Check if user is in a voice channel
-    const { member } = interaction;
-    if (member instanceof GuildMember) {
+    const { member, client, guildId } = interaction;
+    if (member instanceof GuildMember && client instanceof BotClient) {
       if (!member.voice.channel) {
         interaction.reply({
           content: "You must be in a voice channel to play music.",
@@ -33,17 +46,67 @@ const PlayCommand: CommandType = {
         });
         return;
       }
-      //Add url to music queue
-      const musicTitle: string = await getMusicTitle(url, urlType);
-      const musicQueue = new MusicQueue({
-        guildId: interaction.guildId,
-        userId: interaction.user.id,
-        url: url,
-        title: musicTitle,
-      });
-      await musicQueue.save();
-      interaction.reply("Bing-Bong");
+      await interaction.deferReply();
+      // get existing music subscription for server if one exisits
+      let subscription = client.subscriptions.get(guildId);
+      // If there is no connection to the guild create one
+      if (!subscription) {
+        const channel = member.voice.channel;
+        subscription = new MusicSubscription(
+          joinVoiceChannel({
+            channelId: channel.id,
+            guildId: guildId,
+            adapterCreator: channel.guild.voiceAdapterCreator,
+          })
+        );
+        subscription.voiceConnection.on("error", console.warn);
+        client.subscriptions.set(guildId, subscription);
+      }
+      // Make sure the connection is ready before processing the user's request
+      try {
+        await entersState(
+          subscription.voiceConnection,
+          VoiceConnectionStatus.Ready,
+          20e3
+        );
+      } catch (error) {
+        console.warn(error);
+        await interaction.followUp(
+          "Failed to join voice channel within 20 seconds, please try again later. "
+        );
+        return;
+      }
+
+      try {
+        // Attempt to create a Track from the user's video URL
+        const track = await Track.from(url, {
+          onStart() {
+            interaction
+              .followUp({ content: "Now playing!", ephemeral: true })
+              .catch(console.warn);
+          },
+          onFinish() {
+            interaction
+              .followUp({ content: "Now Finished!", ephemeral: true })
+              .catch(console.warn);
+          },
+          onError(error) {
+            console.warn(error);
+            interaction
+              .followUp({ content: `Error: ${error}`, ephemeral: true })
+              .catch(console.warn);
+          },
+        });
+        subscription.enqueue(track);
+        await interaction.followUp(`Enqueued **${track.title}**`);
+      } catch (error) {
+        console.warn(error);
+        await interaction.followUp(
+          `Failed to play track, please try again later!`
+        );
+      }
     }
+    interaction.followUp("Bing-Bong");
   },
 };
 export default PlayCommand;
@@ -83,4 +146,16 @@ async function getMusicTitle(url: string, urlType: string): Promise<string> {
     console.log(`Error getting music title: ${error}`);
     return null;
   }
+}
+function hasPermissons(
+  interaction: CommandInteraction,
+  voiceChannel: VoiceChannel | StageChannel
+): string {
+  const permissions = voiceChannel.permissionsFor(interaction.client.user);
+  if (!permissions.has("CONNECT")) {
+    return "I need the permissions to join your voice channel!";
+  } else if (!permissions.has("SPEAK")) {
+    return "I need permission to speak in your voice channel!";
+  }
+  return null;
 }

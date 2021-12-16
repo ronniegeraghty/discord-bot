@@ -4,6 +4,7 @@ import { Client, ClientOptions, Collection, Message } from "discord.js";
 import { COMMANDS, RawCommand, RawCommandOptions } from "./Command";
 import mongoose from "mongoose";
 import { DatabaseOptions } from "../database/DatabaseOptions.type";
+import MusicSubscription from "./Subscription";
 
 export default class BotClient extends Client {
   public token: string;
@@ -11,6 +12,7 @@ export default class BotClient extends Client {
   public commands: Collection<string, COMMANDS>;
   public rawCommands: Collection<string, RawCommand>;
   public rawCommandOptions: RawCommandOptions;
+  public subscriptions: Collection<string, MusicSubscription>;
   public constructor(
     token: string,
     dbOptions: DatabaseOptions,
@@ -23,6 +25,7 @@ export default class BotClient extends Client {
     this.commands = new Collection<string, COMMANDS>();
     this.rawCommands = new Collection<string, RawCommand>();
     this.rawCommandOptions = rawCommandOptions;
+    this.subscriptions = new Collection<string, MusicSubscription>();
   }
   public start() {
     console.log("Starting Bot");
