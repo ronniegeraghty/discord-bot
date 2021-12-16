@@ -112,11 +112,6 @@ export default PlayCommand;
 
 function getURLType(url: string): string {
   let endIndex: number = findUrlEndPoint(url);
-  console.log(
-    "🚀 ~ file: PlayCommand.ts ~ line 115 ~ getURLType ~ endIndex",
-    endIndex
-  );
-  console.log(` - URL without endpoint: ${url.substring(0, endIndex)}`);
   switch (url.substring(0, endIndex)) {
     case "https://www.youtube":
       return "youtube";
