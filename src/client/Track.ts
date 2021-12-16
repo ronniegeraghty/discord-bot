@@ -38,32 +38,6 @@ export default class Track implements TrackData {
 
   public createAudioResource(): Promise<AudioResource<Track>> {
     return new Promise((resolve, reject) => {
-      // const process = ytdl(
-      //   this.url,
-      //   {},
-      //   { stdio: ["ignore", "pipe", "ignore"] }
-      // );
-      // if (!process.stdout) {
-      //   reject(new Error("No stdout"));
-      // }
-      // const stream = process.stdout;
-      // const onError = (error: Error) => {
-      //   if (!process.killed) process.kill();
-      //   stream.resume();
-      //   reject(error);
-      // };
-      // process.once("spawn", () => {
-      //   demuxProbe(stream)
-      //     .then((probe: { stream: any; type: any }) =>
-      //       resolve(
-      //         createAudioResource(probe.stream, {
-      //           metadata: this,
-      //           inputType: probe.type,
-      //         })
-      //       )
-      //     )
-      //     .catch(onError);
-      // });
       const stream = ytdl(this.url, { filter: "audioonly" });
       demuxProbe(stream).then((probe: { stream: any; type: any }) =>
         resolve(

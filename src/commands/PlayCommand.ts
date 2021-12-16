@@ -2,7 +2,6 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import {
   CommandInteraction,
   GuildMember,
-  InteractionCollector,
   StageChannel,
   VoiceChannel,
 } from "discord.js";
@@ -113,6 +112,11 @@ export default PlayCommand;
 
 function getURLType(url: string): string {
   let endIndex: number = findUrlEndPoint(url);
+  console.log(
+    "🚀 ~ file: PlayCommand.ts ~ line 115 ~ getURLType ~ endIndex",
+    endIndex
+  );
+  console.log(` - URL without endpoint: ${url.substring(0, endIndex)}`);
   switch (url.substring(0, endIndex)) {
     case "https://www.youtube":
       return "youtube";
@@ -128,7 +132,7 @@ function findUrlEndPoint(url: string): number {
   const endPointList = [".com", ".be"];
   for (let endPoint of endPointList) {
     const endPointIndex = url.toString().indexOf(endPoint);
-    if (endPointIndex) {
+    if (endPointIndex !== -1) {
       return endPointIndex;
     }
   }
