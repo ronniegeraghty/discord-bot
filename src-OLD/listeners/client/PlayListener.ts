@@ -19,9 +19,8 @@ export default class ReadyListener extends Listener {
 
   public async exec(message: Message): Promise<void> {
     //Get the music queue Repo.
-    const musicQueueRepo: Repository<MusicQueue> = this.client.db.getRepository(
-      MusicQueue
-    );
+    const musicQueueRepo: Repository<MusicQueue> =
+      this.client.db.getRepository(MusicQueue);
     //Get the music queue
     const musicQueue: MusicQueue[] = await musicQueueRepo.find({
       guild: message.guild.id,

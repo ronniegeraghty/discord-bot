@@ -15,7 +15,7 @@ import {
   joinVoiceChannel,
   VoiceConnectionStatus,
 } from "@discordjs/voice";
-import Track from "../client/Track";
+import Track, { ULRTYPES } from "../client/Track";
 
 const PlayCommand: CommandType = {
   data: new SlashCommandBuilder()
@@ -28,13 +28,8 @@ const PlayCommand: CommandType = {
         .setRequired(true)
     ),
   async execute(interaction) {
-    //Validate URL and get URL Type
+    //Get URL Option
     let url: string = interaction.options.getString("url");
-    const urlType = getURLType(url);
-    if (!urlType) {
-      interaction.reply({ content: "Invalid URL", ephemeral: true });
-      return;
-    }
     //Check if user is in a voice channel
     const { member, client, guildId } = interaction;
     if (member instanceof GuildMember && client instanceof BotClient) {
@@ -81,13 +76,14 @@ const PlayCommand: CommandType = {
         const track = await Track.from(url, {
           onStart() {
             interaction
-              .followUp({ content: "Now playing!", ephemeral: true })
+              .followUp({
+                content: `Now playing ${track.title}!`,
+                ephemeral: true,
+              })
               .catch(console.warn);
           },
           onFinish() {
-            interaction
-              .followUp({ content: "Now Finished!", ephemeral: true })
-              .catch(console.warn);
+            // no need for follow up message on finish.
           },
           onError(error) {
             console.warn(error);
@@ -97,20 +93,19 @@ const PlayCommand: CommandType = {
           },
         });
         subscription.enqueue(track);
-        await interaction.followUp(`Enqueued **${track.title}**`);
+        await interaction.followUp(`Queued **${track.title}**`);
       } catch (error) {
-        console.warn(error);
+        console.warn(` - Warn Error: ${error}`);
         await interaction.followUp(
-          `Failed to play track, please try again later!`
+          `Failed to play track. Reason: ${error}\nPlease try again later!`
         );
       }
     }
-    interaction.followUp("Bing-Bong");
   },
 };
 export default PlayCommand;
 
-function getURLType(url: string): string {
+function getURLType(url: string): ULRTYPES {
   let endIndex: number = findUrlEndPoint(url);
   switch (url.substring(0, endIndex)) {
     case "https://www.youtube":
