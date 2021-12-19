@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import { CommandType } from "../client/Command";
 import ytdl from "ytdl-core";
-import scdl from "soundcloud-downloader";
 import BotClient from "../client/BotClient";
 import MusicSubscription from "../client/Subscription";
 import {
@@ -128,19 +127,7 @@ function findUrlEndPoint(url: string): number {
   }
   return 0;
 }
-async function getMusicTitle(url: string, urlType: string): Promise<string> {
-  try {
-    switch (urlType) {
-      case "youtube":
-        return (await ytdl.getBasicInfo(url)).videoDetails.title;
-      case "soundcloud":
-        return (await scdl.getInfo(url)).title;
-    }
-  } catch (error) {
-    console.log(`Error getting music title: ${error}`);
-    return null;
-  }
-}
+
 function hasPermissons(
   interaction: CommandInteraction,
   voiceChannel: VoiceChannel | StageChannel

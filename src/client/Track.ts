@@ -4,9 +4,8 @@ import {
   demuxProbe,
 } from "@discordjs/voice";
 import ytdl, { getBasicInfo as getYoutubeInfo } from "ytdl-core";
-import soundcloud_downloader from "soundcloud-downloader";
 import { Readable } from "stream";
-const { getInfo: getSoundCloudInfo, download: scdl } = soundcloud_downloader;
+
 /**
  * This is the data required to create a Track Object
  */
@@ -57,8 +56,8 @@ export default class Track implements TrackData {
         case "youtube":
           stream = ytdl(this.url, { filter: "audioonly" });
           break;
-        case "soundcloud":
-          stream = await scdl(this.url);
+        default:
+          reject();
       }
 
       demuxProbe(stream).then((probe: { stream: any; type: any }) =>
@@ -132,8 +131,8 @@ export default class Track implements TrackData {
     switch (urlType) {
       case "youtube":
         return (await getYoutubeInfo(url)).videoDetails.title;
-      case "soundcloud":
-        return (await getSoundCloudInfo(url)).title;
+      default:
+        return "";
     }
   }
 }

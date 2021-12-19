@@ -24,7 +24,6 @@
     "libsodium-wrappers": "^0.7.9",
     "mongoose": "^6.1.1",
     "opusscript": "^0.0.8",
-    "soundcloud-downloader": "^1.0.0",
     "ytdl-core": "^4.9.2"
   },
   "devDependencies": {
