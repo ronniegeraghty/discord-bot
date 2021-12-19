@@ -6,7 +6,6 @@ import {
   VoiceChannel,
 } from "discord.js";
 import { CommandType } from "../client/Command";
-import ytdl from "ytdl-core";
 import BotClient from "../client/BotClient";
 import MusicSubscription from "../client/Subscription";
 import {
@@ -72,7 +71,7 @@ const PlayCommand: CommandType = {
 
       try {
         // Attempt to create a Track from the user's video URL
-        const track = await Track.from(url, {
+        const track = await Track.from(url, interaction.user.tag, {
           onStart() {
             interaction
               .followUp({

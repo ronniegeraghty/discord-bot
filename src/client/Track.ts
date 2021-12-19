@@ -13,6 +13,7 @@ export interface TrackData {
   url: string;
   urlType: ULRTYPES;
   title: string;
+  userTag: string;
   onStart: () => void;
   onFinish: () => void;
   onError: (error: Error) => void;
@@ -29,6 +30,7 @@ export default class Track implements TrackData {
   public readonly url: string;
   public readonly urlType: ULRTYPES;
   public readonly title: string;
+  public readonly userTag: string;
   public readonly onStart: () => void;
   public readonly onFinish: () => void;
   public readonly onError: (error: Error) => void;
@@ -37,6 +39,7 @@ export default class Track implements TrackData {
     url,
     urlType,
     title,
+    userTag,
     onStart,
     onFinish,
     onError,
@@ -44,6 +47,7 @@ export default class Track implements TrackData {
     this.url = url;
     this.urlType = urlType;
     this.title = title;
+    this.userTag = userTag;
     this.onStart = onStart;
     this.onFinish = onFinish;
     this.onError = onError;
@@ -73,6 +77,7 @@ export default class Track implements TrackData {
 
   public static from(
     url: string,
+    userTag: string,
     methods: Pick<Track, "onStart" | "onFinish" | "onError">
   ): Promise<Track> {
     return new Promise(async (resolve, reject) => {
@@ -99,6 +104,7 @@ export default class Track implements TrackData {
           title: title,
           urlType,
           url,
+          userTag,
           ...wrapperMethods,
         })
       );
