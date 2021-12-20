@@ -1,12 +1,13 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { AudioPlayerStatus } from "@discordjs/voice";
 import { CommandInteraction, CacheType } from "discord.js";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 
-class NextCommand extends CommandAbs {
+class ResumeCommand extends CommandAbs {
   public data = new SlashCommandBuilder()
-    .setName("skip")
-    .setDescription("Skip to next song in the queue");
+    .setName("resume")
+    .setDescription("Resume playing the current song.");
   public async execute(
     interaction: CommandInteraction<CacheType>
   ): Promise<void> {
@@ -22,14 +23,18 @@ class NextCommand extends CommandAbs {
           ephemeral: true,
         });
         return;
+      } else if (
+        subscription.audioPlayer.state.status === AudioPlayerStatus.Playing
+      ) {
+        await interaction.reply({
+          content: "Music is already playing",
+          ephemeral: true,
+        });
+        return;
       }
-      //Calling .stop() on an AudioPlay causes it to transition into the Idle state. Because of a state transition
-      // listener defined in client/Subscription.ts, transitions into the Idle state mean the next track from the queue
-      // will be loaded and played.
-      subscription.audioPlayer.stop();
-      await interaction.reply("Skipped song.");
+      subscription.audioPlayer.unpause();
+      await interaction.reply("Music unpaused!");
     }
   }
 }
-
-export default new NextCommand();
+export default new ResumeCommand();
