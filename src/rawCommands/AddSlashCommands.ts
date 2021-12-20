@@ -8,7 +8,7 @@ import { refreshCommandsForGuild } from "../DeployCommands";
 
 class AddSlashCommands extends RawCommand {
   public constructor() {
-    super("add-slash-command");
+    super("add-slash-commands");
   }
   async execute(message: Message): Promise<void> {
     const { guildId } = message;
