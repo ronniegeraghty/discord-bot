@@ -2,6 +2,8 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import {
   CommandInteraction,
   GuildMember,
+  MessageActionRow,
+  MessageButton,
   StageChannel,
   VoiceChannel,
 } from "discord.js";
@@ -73,10 +75,27 @@ const PlayCommand: CommandType = {
         // Attempt to create a Track from the user's video URL
         const track = await Track.from(url, interaction.user.tag, {
           onStart() {
+            //create playback buttons
+            const buttons = new MessageActionRow().addComponents(
+              new MessageButton()
+                .setCustomId("play")
+                .setLabel("▶")
+                .setStyle("PRIMARY"),
+              new MessageButton()
+                .setCustomId("pause")
+                .setLabel("pause")
+                .setStyle("PRIMARY"),
+              new MessageButton()
+                .setCustomId("next")
+                .setLabel("⏭")
+                .setStyle("PRIMARY")
+            );
+
             interaction
               .followUp({
                 content: `Now playing ${track.title}!`,
                 ephemeral: true,
+                components: [buttons],
               })
               .catch(console.warn);
           },
