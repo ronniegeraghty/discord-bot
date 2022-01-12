@@ -1,15 +1,18 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, CacheType } from "discord.js";
+import { CommandInteraction, CacheType, ButtonInteraction } from "discord.js";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 
-class NextCommand extends CommandAbs {
+export class NextCommand extends CommandAbs {
   public data = new SlashCommandBuilder()
     .setName("skip")
     .setDescription("Skip to next song in the queue");
   public async execute(
     interaction: CommandInteraction<CacheType>
   ): Promise<void> {
+    this.next(interaction);
+  }
+  public async next(interaction: CommandInteraction | ButtonInteraction) {
     //get client and make do type check to get subscriptions
     const { client } = interaction;
     if (client instanceof BotClient) {

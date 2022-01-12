@@ -1,16 +1,19 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { AudioPlayerStatus } from "@discordjs/voice";
-import { CommandInteraction, CacheType } from "discord.js";
+import { CommandInteraction, CacheType, ButtonInteraction } from "discord.js";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 
-class PauseCommand extends CommandAbs {
+export class PauseCommand extends CommandAbs {
   public data = new SlashCommandBuilder()
     .setName("pause")
     .setDescription("Pause the current song.");
   public async execute(
     interaction: CommandInteraction<CacheType>
   ): Promise<void> {
+    this.pause(interaction);
+  }
+  public async pause(interaction: CommandInteraction | ButtonInteraction) {
     //get client and make do type check to get subscriptions
     const { client } = interaction;
     if (client instanceof BotClient) {
