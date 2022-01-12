@@ -4,6 +4,7 @@ const subscribedGuild = new mongoose.Schema({
   guildId: {
     type: String,
     unique: true,
+    required: true,
   },
 });
 

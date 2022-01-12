@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Interaction, Message } from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 
 export type CommandOptions = {
   name: string;
   description: string;
-  execute?: (interaction: Interaction) => void;
+  execute?: (interaction: CommandInteraction) => void;
 };
 
 class BaseCommand {
@@ -17,7 +17,7 @@ class BaseCommand {
 }
 
 export default class Command extends BaseCommand {
-  public execute: (interaction: Interaction) => void;
+  public execute: (interaction: CommandInteraction) => void;
   public constructor(options: CommandOptions) {
     super(options);
     this.execute = options.execute;
@@ -25,12 +25,12 @@ export default class Command extends BaseCommand {
 }
 export abstract class CommandAbs {
   abstract data: SlashCommandBuilder;
-  abstract execute(interaction: Interaction): void;
+  abstract execute(interaction: CommandInteraction): void;
 }
 
 export type CommandType = {
   data: any;
-  execute: (Interaction: Interaction) => void;
+  execute: (Interaction: CommandInteraction) => void;
 };
 
 export abstract class RawCommand {
