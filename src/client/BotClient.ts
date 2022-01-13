@@ -158,7 +158,7 @@ export default class BotClient extends Client {
       `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`,
       {},
       (err: Error) => {
-        if (err) throw err;
+        if (err) throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
         console.log(`Connected to MongoDB`);
       }
     );

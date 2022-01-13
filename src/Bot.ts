@@ -1,9 +1,24 @@
 import { token, databaseConfig, rawCommandOptions } from "./config.json";
 import BotClient from "./client/BotClient";
 import { Intents } from "discord.js";
+import * as dotenv from "dotenv";
+dotenv.config();
+
+let dbConfig = databaseConfig;
+
+//Check if Prod Env and if Prod change config options
+if (process.env.ENV === "PROD") {
+  console.log(`Configuring for PROD`);
+  dbConfig = {
+    ...databaseConfig,
+    url: process.env.MONGO_HOST_NAME,
+    dbOptions: "authSource=admin",
+  };
+}
+console.log("DB CONFIG: ", dbConfig);
 
 // Create instance of client
-const client = new BotClient(token, databaseConfig, rawCommandOptions, {
+const client = new BotClient(token, dbConfig, rawCommandOptions, {
   intents: [
     Intents.FLAGS.GUILDS,
     //Intents.FLAGS.GUILD_MEMBERS,
@@ -23,5 +38,5 @@ const client = new BotClient(token, databaseConfig, rawCommandOptions, {
   ],
 });
 
-// Login to Discord with your client's token
+// Start Bot
 client.start();

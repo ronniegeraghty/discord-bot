@@ -82,7 +82,7 @@ function publishSlashCommands(
     const commands = [];
     const commandFiles = fs
       .readdirSync(commandPath)
-      .filter((file) => file.endsWith(".ts"));
+      .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of commandFiles) {
       commands.push(
         import(`./commands/${file}`).then(

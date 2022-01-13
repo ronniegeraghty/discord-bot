@@ -1,15 +1,35 @@
-version: "3"
+version: "3.9"
 
 services:
+  mongodb:
+    container_name: mongodb-discord-bot
+    image: mongo:5.0.2
+    restart: "unless-stopped"
+    hostname: mongodb
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
+    ports:
+      - "${MONGO_EXTERNAL_PORT}:27017"
+    volumes:
+      - /c/Users/Ronnie/Desktop/Coding/Containers/discord-bot-mongo:/data/db
+    networks:
+      - mongo-discord-bot-network
   discord-bot:
     container_name: discord-bot
-    restart: always
+    restart: "unless-stopped"
+    depends_on:
+      - mongodb
+    environment:
+      - ENV=PROD
+      - MONGO_HOST_NAME=mongodb
     networks:
-      - api_server_default
+      - mongo-discord-bot-network
     build:
       context: .
       dockerfile: Dockerfile
-    image: discord-bot:1.0.0
+    image: discord-bot:2.0.0
 networks:
-  api_server_default:
+  mongo-discord-bot-network:
     driver: bridge
