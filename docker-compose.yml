@@ -1,6 +1,19 @@
 version: "3.9"
-
 services:
+  discord-bot:
+    container_name: discord-bot
+    restart: "unless-stopped"
+    depends_on:
+      - mongodb
+    environment:
+      - ENV=PROD
+      - MONGO_HOST_NAME=mongodb
+    networks:
+      - mongo-discord-bot-network
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: discord-bot:2.0.0
   mongodb:
     container_name: mongodb-discord-bot
     image: mongo:5.0.2
@@ -16,20 +29,6 @@ services:
       - /c/Users/Ronnie/Desktop/Coding/Containers/discord-bot-mongo:/data/db
     networks:
       - mongo-discord-bot-network
-  discord-bot:
-    container_name: discord-bot
-    restart: "unless-stopped"
-    depends_on:
-      - mongodb
-    environment:
-      - ENV=PROD
-      - MONGO_HOST_NAME=mongodb
-    networks:
-      - mongo-discord-bot-network
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: discord-bot:2.0.0
 networks:
   mongo-discord-bot-network:
     driver: bridge
