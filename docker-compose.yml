@@ -26,7 +26,7 @@ services:
     ports:
       - "${MONGO_EXTERNAL_PORT}:27017"
     volumes:
-      - /c/Users/Ronnie/Desktop/Coding/Containers/discord-bot-mongo:/data/db
+      - ${MONGO_VOLUME_MOUNT}:/data/db
     networks:
       - mongo-discord-bot-network
 networks:
