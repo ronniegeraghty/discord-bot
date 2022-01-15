@@ -6,7 +6,7 @@ services:
     depends_on:
       - mongodb
     environment:
-      - ENV=PROD
+      - ENV=CONTAINER
       - MONGO_HOST_NAME=mongodb
     networks:
       - mongo-discord-bot-network
