@@ -8,11 +8,13 @@ import {
   MessageActionRow,
   MessageButton,
   MessageButtonStyleResolvable,
+  MessageComponentInteraction,
 } from "discord.js";
 import { CommandType } from "../client/Command";
 import BotClient from "../client/BotClient";
 import MusicSubscription from "../client/Subscription";
 import {
+  DiscordGatewayAdapterCreator,
   entersState,
   joinVoiceChannel,
   VoiceConnectionStatus,
@@ -79,7 +81,9 @@ function createSubscription(
     joinVoiceChannel({
       channelId: channel.id,
       guildId: guildId,
-      adapterCreator: channel.guild.voiceAdapterCreator,
+      //TODO: update below when discordjs and discordjs/voice incompatibility is resolved
+      adapterCreator: channel.guild
+        .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
     })
   );
   subscription.voiceConnection.on("error", console.warn);
@@ -212,7 +216,8 @@ function createButtonInteractionCollector(
   if (client.collectors.has(`${guildId}.${channelId}.PlayPauseNextButton`))
     return;
   // Create filter for the collector
-  const filter = (i: ButtonInteraction) => i.customId in playbackButton;
+  const filter = (i: MessageComponentInteraction) =>
+    i.customId in playbackButton;
   // Create collector
   const collector: InteractionCollector<Interaction> =
     interaction.channel.createMessageComponentCollector({ filter });

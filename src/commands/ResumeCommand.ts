@@ -1,11 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { AudioPlayerStatus } from "@discordjs/voice";
-import {
-  CommandInteraction,
-  CacheType,
-  Interaction,
-  ButtonInteraction,
-} from "discord.js";
+import { CommandInteraction, CacheType, ButtonInteraction } from "discord.js";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 
