@@ -1,0 +1,7 @@
+.vscode
+.env
+src-OLD
+.env.example
+docker-compose.yml
+Dockerfile
+RWADME.md

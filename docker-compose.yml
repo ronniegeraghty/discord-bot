@@ -7,13 +7,21 @@ services:
       - mongodb
     environment:
       - ENV=CONTAINER
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - CLIENT_ID=${CLIENT_ID}
+      - PREFIX=${PREFIX}
       - MONGO_HOST_NAME=mongodb
+      - MONGO_ROOT_USER=${MONGO_ROOT_USER}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INTERNAL_PORT=${MONGO_INTERNAL_PORT}
+      - MONGO_DATABASE=${MONGO_DATABASE}
+      - MONGO_OPTIONS=${MONGO_OPTIONS}
     networks:
       - mongo-discord-bot-network
     build:
       context: .
       dockerfile: Dockerfile
-    image: discord-bot:2.0.0
+    image: discord-bot:2.0.1
   mongodb:
     container_name: mongodb-discord-bot
     image: mongo:5.0.2
