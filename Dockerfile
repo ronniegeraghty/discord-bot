@@ -22,6 +22,7 @@ ADD . /app/
 #Run Fix for Mongoose dep Mongodb:4.2.2 
 RUN chmod +x ci-cd/mongooseFix.sh
 RUN ./ci-cd/mongooseFix.sh
+RUN echo 'dingus'
 
 #Run Typescript build
 RUN npm run build
