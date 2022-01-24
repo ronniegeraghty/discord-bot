@@ -4,4 +4,4 @@ build
 src/Config.ts
 src/config.json
 src-OLD/Config.ts
-db.sqlite
+package-lock.json

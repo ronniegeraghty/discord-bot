@@ -2,19 +2,41 @@ import fs from "fs";
 import { join } from "path";
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { clientId, token, databaseConfig as dbOptions } from "./config.json";
-import Command, { CommandAbs, CommandType } from "./client/Command";
+import Command, {
+  CommandAbs,
+  CommandType,
+  RawCommandOptions,
+} from "./client/Command";
 import SubscribedGuild, {
   SubscribedGuildInterface,
 } from "./database/schemas/SubscribedGuilds";
 import mongoose, { Error } from "mongoose";
+import * as dotenv from "dotenv";
+import { DatabaseOptions } from "./database/DatabaseOptions.type";
+dotenv.config();
+
+const token = process.env.DISCORD_TOKEN;
+const clientId = process.env.CLIENT_ID;
+const dbConfig: DatabaseOptions = {
+  username: process.env.MONGO_ROOT_USER,
+  password: process.env.MONGO_ROOT_PASSWORD,
+  url:
+    process.env.ENV === "CONTAINER" ? process.env.MONGO_HOST_NAME : "localhost",
+  port: process.env.MONGO_INTERNAL_PORT,
+  dbName: process.env.MONGO_DATABASE,
+  dbOptions: process.env.MONGO_OPTIONS,
+};
+
+const rawCommandOptions: RawCommandOptions = {
+  prefix: process.env.PREFIX,
+};
 
 //Process cli args
 switch (process.argv.slice(2)[0]) {
   case "-deploy": {
     console.log(`Deploying Slash Commands from CLI!`);
     mongoose.connect(
-      `mongodb://${dbOptions.username}:${dbOptions.password}@${dbOptions.url}:${dbOptions.port}/${dbOptions.dbName}?${dbOptions.dbOptions}`,
+      `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`,
       {},
       (err: Error) => {
         if (err) throw err;
@@ -30,7 +52,7 @@ switch (process.argv.slice(2)[0]) {
   case "-wipe": {
     console.log(`Wiping Slash Commands from CLI!`);
     mongoose.connect(
-      `mongodb://${dbOptions.username}:${dbOptions.password}@${dbOptions.url}:${dbOptions.port}/${dbOptions.dbName}?${dbOptions.dbOptions}`,
+      `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`,
       {},
       (err: Error) => {
         if (err) throw err;
@@ -82,7 +104,7 @@ function publishSlashCommands(
     const commands = [];
     const commandFiles = fs
       .readdirSync(commandPath)
-      .filter((file) => file.endsWith(".ts"));
+      .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of commandFiles) {
       commands.push(
         import(`./commands/${file}`).then(

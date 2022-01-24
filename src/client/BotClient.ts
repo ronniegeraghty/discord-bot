@@ -50,6 +50,7 @@ export default class BotClient extends Client {
     this.loadRawCommands();
     this.loadEventListeners();
     this.connectDatabase();
+    this.killBot();
   }
   private loadCommands() {
     const commandPath = join(__dirname, "..", "commands");
@@ -158,9 +159,26 @@ export default class BotClient extends Client {
       `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`,
       {},
       (err: Error) => {
-        if (err) throw err;
+        if (err) throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
         console.log(`Connected to MongoDB`);
       }
     );
+  }
+  killBot() {
+    process.on("SIGTERM", () => {
+      console.info("SIGTERM singal revieved");
+      console.log("Logging off from Discord");
+      this.destroy();
+      console.log("Logged off");
+      console.log("Closing MongoDB Connection");
+      mongoose.connection.close(false, (err) => {
+        if (err) {
+          console.error(err);
+          process.exit(1);
+        }
+        console.log("MongoDB Connection Closed");
+        process.exit(0);
+      });
+    });
   }
 }

@@ -4,8 +4,8 @@ import {
   MessageActionRow,
   MessageButton,
   InteractionCollector,
-  ButtonInteraction,
   CommandInteraction,
+  MessageComponentInteraction,
 } from "discord.js";
 import { CommandAbs } from "../client/Command";
 
@@ -40,7 +40,7 @@ class RPSCommand extends CommandAbs {
       content: "Choose your hand:",
       components: [buttons],
     });
-    const filter = (i: ButtonInteraction) =>
+    const filter = (i: MessageComponentInteraction) =>
       i.customId in this.HANDS && i.user.id === interaction.user.id;
 
     const collector: InteractionCollector<Interaction> =
