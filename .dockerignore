@@ -6,3 +6,4 @@ docker-compose.yml
 Dockerfile
 RWADME.md
 build
+node_modules
