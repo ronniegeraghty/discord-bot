@@ -1,45 +1,38 @@
-#BUILD CONTAINER
-FROM node:16.13.2-alpine3.14 as ts-compiler
-#Env
-
-#Work Dir
-WORKDIR /app/   
-
-#Config Git cache
-RUN apk add --no-cache git
-#Add FFmpeg
-RUN apk add --no-cache ffmpeg
-#Add Bash
-RUN apk add --no-cache bash
-
-#Copy CI scripts dir 
-COPY ci ./ci/
-
-#Copy package.json and install packages
+FROM node:16.13.2-alpine3.14 AS dev
+WORKDIR /development/
 COPY package.json .
 RUN npm install
+COPY . .
 #Run Post NPM Install Fixes
 RUN chmod +x ci/postInstallFixes.sh
 RUN ./ci/postInstallFixes.sh
 
-#Add all source code
-ADD . /app/
+#BUILD CONTAINER
+FROM dev AS ts-compiler
 
-
+#Config Git cache
+# RUN apk add --no-cache git
+#Add FFmpeg
+# RUN apk add --no-cache ffmpeg
 
 #Run Typescript build
 RUN npm run build
 
 
 #RUNTIME CONTAINER
-FROM node:16.13.2-alpine3.14
+FROM node:16.13.2-alpine3.14 AS prod
 WORKDIR /app/
 RUN apk add --no-cache git
 RUN apk add --no-cache ffmpeg
-COPY --from=ts-compiler /app/package*.json ./
-COPY --from=ts-compiler /app/node_modules/ ./node_modules/
+COPY --from=ts-compiler /development/package*.json ./
+#COPY --from=ts-compiler /dev/node_modules/ ./node_modules/
 RUN npm cache clean --force
+RUN npm ci --only=prod
+#Run Post NPM Install Fixes
+COPY --from=ts-compiler /development/ci/ ./ci/
+RUN chmod +x ci/postInstallFixes.sh
+RUN ./ci/postInstallFixes.sh
 USER node
-COPY --from=ts-compiler --chown=node /app/build/ ./build/
+COPY --from=ts-compiler --chown=node /development/build/ ./build/
 #Start
 ENTRYPOINT ["npm","start"]
