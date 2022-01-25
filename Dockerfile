@@ -9,6 +9,8 @@ WORKDIR /app/
 RUN apk add --no-cache git
 #Add FFmpeg
 RUN apk add --no-cache ffmpeg
+#Add Bash
+RUN apk add --no-cache bash
 
 #Copy package.json and install packages
 COPY package.json .
@@ -16,6 +18,10 @@ RUN npm install
 
 #Add all source code
 ADD . /app/
+
+#Run Fix for Mongoose dep Mongodb:4.2.2 
+RUN chmod +x ci-cd/mongooseFix.sh
+RUN ./ci-cd/mongooseFix.sh
 
 #Run Typescript build
 RUN npm run build
