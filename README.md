@@ -24,3 +24,4 @@ npm run build
 npm run start
 ```
 When you see `Your_Bot#0000 is now online and ready!` in the terminal the bot is up and running. 
+test
