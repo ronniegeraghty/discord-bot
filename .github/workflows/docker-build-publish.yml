@@ -1,5 +1,5 @@
 # This is a basic workflow to help you get started with Actions
-name: Docker Build & Publish if Main Branch
+name: Docker Build & Publish
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
@@ -23,6 +23,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
         uses: actions/checkout@v2
+      # Check PUSH_PACKAGE variable
+      - name: Check PUSH_PACKAGE
+        run: echo $PUSH_PACKAGE
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
