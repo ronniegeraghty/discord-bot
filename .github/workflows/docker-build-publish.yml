@@ -47,13 +47,16 @@ jobs:
       - name: Tag and push tag
         if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         run: |
-          git tag 2.0.6
-          git push origin 2.0.6
+          git tag v2.0.6
+          git push origin v2.0.6
+      #Use metadata to create image tag
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@v1
+        uses: docker/metadata-action@v3
         with:
           images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+          tags: |
+            type=semver,pattern={{version}}
 
       # Run Docker build
       - name: Run Docker Build & Publish
