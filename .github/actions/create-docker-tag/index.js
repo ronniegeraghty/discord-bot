@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const http = requier("http");
+// const http = requier("http");
 
 try {
   // // `image` input defined in action metadata file
