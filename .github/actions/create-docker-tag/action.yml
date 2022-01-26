@@ -8,5 +8,6 @@ outputs:
   tag: # id of output
     description: "tag for the docker container"
 runs:
+  pre: npm install
   using: "node16"
   main: "index.js"
