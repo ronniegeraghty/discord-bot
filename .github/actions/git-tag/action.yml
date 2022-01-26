@@ -1,9 +1,9 @@
 name: "Git Tag & Push Tag"
 description: "Tags the branch with next Patch version number, pushes the tag and generates a docker tag."
-# inputs:
-#   image: # id of input
-#     description: "registry/container-name"
-#     required: true
+inputs:
+  image: # id of input
+    description: "registry/container-name"
+    required: true
 outputs:
   docker_tag: # id of output
     description: "tag for the docker container"

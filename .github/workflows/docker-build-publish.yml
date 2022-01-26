@@ -43,10 +43,12 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
-      #Use metadata to create image tag
-      - name: Create Tag for Docker Container
+      #Tag the main branch and push the tag, also generates output to use as docker tag
+      - name: Git Tag & Push
         id: create_tag
-        uses: ./.github/actions/create-docker-tag
+        uses: ./.github/actions/git-tag
+        with:
+          image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
 
       # Run Docker build
       - name: Run Docker Build & Publish
@@ -55,7 +57,7 @@ jobs:
         with:
           push: ${{env.PUSH_PACKAGES}}
           context: .
-          tags: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{steps.create_tag.output.docker_tag}}
+          tags: ${{steps.create_tag.output.docker_tag}}
 
       - name: Image digest
         run: echo ${{steps.docker_build.outputs.digest}}
