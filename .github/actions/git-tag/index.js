@@ -12,9 +12,7 @@ try {
   console.log(`Tags URL: ${tags_url}`);
 
   const octokit = new Octokit();
-  const res = await octokit.request(
-    `GET /repos/${owner.login}/${name}/git/tags/`
-  );
+  const res = octokit.request(`GET /repos/${owner.login}/${name}/git/tags/`);
   console.log(`Response Status: ${res.status}`);
   console.log(`Response Data: ${res.data}`);
 
