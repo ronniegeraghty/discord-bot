@@ -1,11 +1,11 @@
-name: "Create Docker Tag"
-description: "Creates the docker tag to use based on the current git tag"
-inputs:
-  image: # id of input
-    description: "registry/container-name"
-    required: true
+name: "Git Tag & Push Tag"
+description: "Tags the branch with next Patch version number, pushes the tag and generates a docker tag."
+# inputs:
+#   image: # id of input
+#     description: "registry/container-name"
+#     required: true
 outputs:
-  tag: # id of output
+  docker_tag: # id of output
     description: "tag for the docker container"
 runs:
   using: "node16"

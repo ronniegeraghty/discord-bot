@@ -43,21 +43,10 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
-      #Tag and push tag
-      - name: Tag and push_tag
-        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        run: |
-          git tag v2.0.6
-          git push origin v2.0.6
       #Use metadata to create image tag
       - name: Create Tag for Docker Container
-        id: create-tag
+        id: create_tag
         uses: ./.github/actions/create-docker-tag
-        with:
-          image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
-        #   tags: |
-        #     type=ref,event=push_tag
-        #     type=semver,pattern={{version}}
 
       # Run Docker build
       - name: Run Docker Build & Publish
@@ -66,6 +55,7 @@ jobs:
         with:
           push: ${{env.PUSH_PACKAGES}}
           context: .
-          tags: ${{steps.meta.outputs.tags}}
+          tags: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}:${{steps.create_tag.output.docker_tag}}
+
       - name: Image digest
         run: echo ${{steps.docker_build.outputs.digest}}
