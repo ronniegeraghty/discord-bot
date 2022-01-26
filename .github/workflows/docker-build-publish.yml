@@ -50,14 +50,14 @@ jobs:
           git tag v2.0.6
           git push origin v2.0.6
       #Use metadata to create image tag
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
-          tags: |
-            type=ref,event=push_tag
-            type=semver,pattern={{version}}
+      - name: Create Tag for Docker Container
+        id: create-tag
+        uses: ./.github/actions/create-docker-tag
+        # with:
+        #   images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+        #   tags: |
+        #     type=ref,event=push_tag
+        #     type=semver,pattern={{version}}
 
       # Run Docker build
       - name: Run Docker Build & Publish
