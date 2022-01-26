@@ -53,8 +53,8 @@ jobs:
       - name: Create Tag for Docker Container
         id: create-tag
         uses: ./.github/actions/create-docker-tag
-        # with:
-        #   images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+        with:
+          image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
         #   tags: |
         #     type=ref,event=push_tag
         #     type=semver,pattern={{version}}

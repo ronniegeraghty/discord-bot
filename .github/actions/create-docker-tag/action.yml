@@ -1,13 +1,12 @@
 name: "Create Docker Tag"
 description: "Creates the docker tag to use based on the current git tag"
-# inputs:
-#   who-to-greet: # id of input
-#     description: "Who to greet"
-#     required: true
-#     default: "World"
-# outputs:
-#   time: # id of output
-#     description: "The time we greeted you"
+inputs:
+  image: # id of input
+    description: "registry/container-name"
+    required: true
+outputs:
+  tag: # id of output
+    description: "tag for the docker container"
 runs:
   using: "node16"
   main: "index.js"
