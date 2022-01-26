@@ -45,7 +45,8 @@ jobs:
       
       #Tag and push tag
       - name: Tag and push tag
-        run: 
+        if: ${{env.PUSH_PACKAGES}}
+        run: |
           git tag 2.0.6
           git push origin 2.0.6
       - name: Extract metadata (tags, labels) for Docker
