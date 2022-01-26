@@ -1,41 +1,43 @@
-#BUILD CONTAINER
-FROM node:16.13.2-alpine3.14 as ts-compiler
-#Env
+FROM node:16.13.2-alpine3.14 AS dev
+#Install dev tools
+RUN apk update
+RUN apk add git
 
-#Work Dir
-WORKDIR /app/   
+WORKDIR /development/
+ADD package.json .
+RUN npm install
+ADD . .
+#Run Post NPM Install Fixes
+RUN chmod +x ci/postInstallFixes.sh
+RUN ./ci/postInstallFixes.sh
+RUN git restore .
+
+#BUILD CONTAINER
+FROM dev AS ts-compiler
 
 #Config Git cache
-RUN apk add --no-cache git
+# RUN apk add --no-cache git
 #Add FFmpeg
-RUN apk add --no-cache ffmpeg
-#Add Bash
-RUN apk add --no-cache bash
-
-#Copy package.json and install packages
-COPY package.json .
-RUN npm install
-
-#Add all source code
-ADD . /app/
-
-#Run Fix for Mongoose dep Mongodb:4.2.2 
-RUN chmod +x ci-cd/mongooseFix.sh
-RUN ./ci-cd/mongooseFix.sh
+# RUN apk add --no-cache ffmpeg
 
 #Run Typescript build
 RUN npm run build
 
 
 #RUNTIME CONTAINER
-FROM node:16.13.2-alpine3.14
+FROM node:16.13.2-alpine3.14 AS prod
 WORKDIR /app/
 RUN apk add --no-cache git
 RUN apk add --no-cache ffmpeg
-COPY --from=ts-compiler /app/package*.json ./
-COPY --from=ts-compiler /app/node_modules/ ./node_modules/
+COPY --from=ts-compiler /development/package*.json ./
+#COPY --from=ts-compiler /dev/node_modules/ ./node_modules/
 RUN npm cache clean --force
+RUN npm ci --only=prod
+#Run Post NPM Install Fixes
+COPY --from=ts-compiler /development/ci/ ./ci/
+RUN chmod +x ci/postInstallFixes.sh
+RUN ./ci/postInstallFixes.sh
 USER node
-COPY --from=ts-compiler --chown=node /app/build/ ./build/
+COPY --from=ts-compiler --chown=node /development/build/ ./build/
 #Start
 ENTRYPOINT ["npm","start"]
