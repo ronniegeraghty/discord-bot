@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v2
       # Check PUSH_PACKAGE variable
       - name: Check PUSH_PACKAGE
-        run: echo ${{env.PUSH_PACKAGE}}
+        run: echo ${{env.PUSH_PACKAGES}}
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
