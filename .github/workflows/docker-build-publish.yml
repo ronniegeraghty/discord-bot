@@ -36,7 +36,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
       # Login to GHCR
       - name: Login to GitHub Container Registry
-        if: ${{env.PUSH_PACKAGES == true}}
+        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         uses: docker/login-action@v1
         with:
           registry: ${{env.REGISTRY}}
@@ -45,7 +45,7 @@ jobs:
 
       #Tag and push tag
       - name: Tag and push tag
-        if: ${{env.PUSH_PACKAGES == true}}
+        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         run: |
           git tag 2.0.6
           git push origin 2.0.6
