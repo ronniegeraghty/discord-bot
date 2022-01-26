@@ -36,12 +36,12 @@ jobs:
         uses: docker/setup-buildx-action@v1
       # Login to GHCR
       - name: Login to GitHub Container Registry
-        if: ${{false}}
+        if: ${{env.PUSH_PACKAGES}}
         uses: docker/login-action@v1
         with: 
           registry: ${{env.REGISTRY}}
           username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
+          password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
       
       - name: Extract metadata (tags, labels) for Docker
         id: meta
