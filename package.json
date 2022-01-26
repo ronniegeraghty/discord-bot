@@ -13,6 +13,8 @@
   "author": "Ronnie Geraghty",
   "license": "ISC",
   "dependencies": {
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
     "@discordjs/builders": "0.9.0",
     "@discordjs/opus": "0.5.3",
     "@discordjs/rest": "0.1.0-canary.0",
