@@ -1,8 +1,12 @@
 FROM node:16.13.2-alpine3.14 AS dev
+#Install dev tools
+RUN apk update
+RUN apk add git
+
 WORKDIR /development/
-COPY package.json .
+ADD package.json .
 RUN npm install
-COPY . .
+ADD . .
 #Run Post NPM Install Fixes
 RUN chmod +x ci/postInstallFixes.sh
 RUN ./ci/postInstallFixes.sh
