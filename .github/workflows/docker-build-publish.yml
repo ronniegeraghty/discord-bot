@@ -4,8 +4,8 @@ name: Docker Build & Publish
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   pull_request:
-    branches: [ main ]
-  push: 
+    branches: [main]
+  push:
     branches: [main]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
   docker-build-publish:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    env: 
+    env:
       PUSH_PACKAGES: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
       REGISTRY: ghcr.io
       IMAGE_NAME: ${{github.repository}}
@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v2
       # Check PUSH_PACKAGE variable
       - name: Check PUSH_PACKAGE
-        run: echo ${{env.PUSH_PACKAGE}}
+        run: echo ${{env.PUSH_PACKAGES}}
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -36,13 +36,19 @@ jobs:
         uses: docker/setup-buildx-action@v1
       # Login to GHCR
       - name: Login to GitHub Container Registry
-        if: ${{env.PUSH_PACKAGES}}
+        if: ${{env.PUSH_PACKAGES == true}}
         uses: docker/login-action@v1
-        with: 
+        with:
           registry: ${{env.REGISTRY}}
           username: ${{github.actor}}
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
-      
+
+      #Tag and push tag
+      - name: Tag and push tag
+        if: ${{env.PUSH_PACKAGES == true}}
+        run: |
+          git tag 2.0.6
+          git push origin 2.0.6
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v1
@@ -53,7 +59,7 @@ jobs:
       - name: Run Docker Build & Publish
         id: docker_build
         uses: docker/build-push-action@v2
-        with: 
+        with:
           push: ${{env.PUSH_PACKAGES}}
           context: .
           tags: ${{steps.meta.outputs.tags}}
