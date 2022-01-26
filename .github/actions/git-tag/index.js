@@ -1,6 +1,6 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
-const https = require("https");
+const { Octokit } = require("@octokit/core");
 
 try {
   // // `image` input defined in action metadata file
@@ -8,16 +8,15 @@ try {
   // console.log(`Base Image Name: ${baseImageName}`);
   // core.setOutput("tag", baseImageName);
 
-  const tagUrl = github.context.payload.repository["tags_url"];
-  console.log(`Tags URL: ${tagUrl}`);
+  const { owner, name, tags_url } = github.context.payload.repository;
+  console.log(`Tags URL: ${tags_url}`);
 
-  let req = https.request(tagUrl, (res) => {
-    console.log(`Status Code: ${res.statusCode}`);
-    res.on("data", (d) => {
-      process.stdout.write(d);
-    });
-  });
-  req.end();
+  const octokit = new Octokit();
+  const res = await octokit.request(
+    `GET /repos/${owner.login}/${name}/git/tags/`
+  );
+  console.log(`Response Status: ${res.status}`);
+  console.log(`Response Data: ${res.data}`);
 
   // Get the JSON webhook payload for the event that triggered the workflow
   const payload = JSON.stringify(github.context.payload, undefined, 2);
