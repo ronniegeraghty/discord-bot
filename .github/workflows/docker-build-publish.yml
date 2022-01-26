@@ -44,7 +44,7 @@ jobs:
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       #Tag and push tag
-      - name: Tag and push tag
+      - name: Tag and push_tag
         if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         run: |
           git tag v2.0.6
