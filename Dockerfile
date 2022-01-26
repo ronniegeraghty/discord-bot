@@ -10,6 +10,7 @@ ADD . .
 #Run Post NPM Install Fixes
 RUN chmod +x ci/postInstallFixes.sh
 RUN ./ci/postInstallFixes.sh
+RUN git restore .
 
 #BUILD CONTAINER
 FROM dev AS ts-compiler
