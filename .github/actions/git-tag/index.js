@@ -3,6 +3,7 @@ const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
 
 async function run() {
+  console.log("🚀 ~ file: index.js ~ line 6 ~ run ~ run", run);
   try {
     let { owner, name, tags_url } = github.context.payload.repository;
     owner = owner.login;
@@ -17,6 +18,10 @@ async function run() {
 const octokit = new Octokit({ auth: null });
 
 async function getLatestTag(owner, repo) {
+  console.log(
+    "🚀 ~ file: index.js ~ line 21 ~ getLatestTag ~ getLatestTag",
+    getLatestTag
+  );
   const endpoint = octokit.repos.listTags;
   const pages = endpoint.endpoint.merge({
     owner: owner,
@@ -34,6 +39,10 @@ async function getLatestTag(owner, repo) {
 }
 
 async function* getItemsFromPages(pages) {
+  console.log(
+    "🚀 ~ file: index.js ~ line 39 ~ function*getItemsFromPages ~ getItemsFromPages",
+    getItemsFromPages
+  );
   for await (const page of octokit.paginate.iterator(pages)) {
     for (const item of page.data) {
       yield item;
