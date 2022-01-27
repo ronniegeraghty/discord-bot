@@ -54,7 +54,10 @@ async function sortTags(tags) {
       console.log("Tag not formatted properly, tag: ", tag);
     } else {
       const tagOb = {
-        major: splitTag[0],
+        major:
+          splitTag[0].substring(0, 1) === "v"
+            ? splitTag[0].substring(1)
+            : splitTag[0],
         minor: splitTag[1],
         patch: splitTag[2],
       };
