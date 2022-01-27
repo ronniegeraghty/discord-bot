@@ -11,7 +11,7 @@ async function run() {
     owner = owner.login;
     console.log(`Repo Owner: ${JSON.stringify(owner)} - Repo Name: ${repo}`);
     const nextTag = await getNextTag(owner, repo);
-    core.setOutput("docker-tag", `${image}:${latestTag}`);
+    core.setOutput("docker-tag", `${image}:${nextTag}`);
   } catch (error) {
     core.setFailed(error);
   }
@@ -24,10 +24,10 @@ async function getNextTag(owner, repo) {
   const tags = await getTags(owner, repo);
   //sort repo tags for latest version tag
   const latestTag = await sortTags(tags);
-  console.log(`Latest Tag: ${latestTag}`);
+  console.log(`Latest Tag: ${tagObjectToString(latestTag)}`);
   const nextTag = { ...latestTag, patch: latestTag.patch + 1 };
-  console.log(`Next Tag: ${nextTag}`);
-  return nextTag;
+  console.log(`Next Tag: ${tagObjectToString(nextTag)}`);
+  return tagObjectToString(nextTag);
 }
 async function getTags(owner, repo) {
   const endpoint = octokit.rest.repos.listTags;
@@ -84,7 +84,9 @@ function convertTagStringToTagObject(tag) {
     };
   }
 }
-
+function tagObjectToString(tag) {
+  return `${tag.major}.${tag.minor}.${tag.patch}`;
+}
 if (require.main === module) {
   run();
 }
