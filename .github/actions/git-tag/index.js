@@ -22,7 +22,11 @@ async function getLatestTag(owner, repo) {
     "🚀 ~ file: index.js ~ line 21 ~ getLatestTag ~ getLatestTag",
     getLatestTag
   );
-  const endpoint = octokit.repos.listTags;
+  const endpoint = octokit.rest.repos.listTags;
+  console.log(
+    "🚀 ~ file: index.js ~ line 26 ~ getLatestTag ~ endpoint",
+    endpoint
+  );
   const pages = endpoint.endpoint.merge({
     owner: owner,
     repo: repo,
