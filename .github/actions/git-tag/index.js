@@ -54,7 +54,7 @@ async function* getItemsFromPages(pages) {
   for await (const page of octokit.paginate.iterator(pages)) {
     for (const item of page.data) {
       console.log(`DATA: ${item.name}`);
-      //yield item;
+      return item;
     }
   }
 }
