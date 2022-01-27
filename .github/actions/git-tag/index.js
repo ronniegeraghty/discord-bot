@@ -25,7 +25,7 @@ async function getNextTag(owner, repo) {
   //sort repo tags for latest version tag
   const latestTag = await sortTags(tags);
   console.log(`Latest Tag: ${tagObjectToString(latestTag)}`);
-  const nextTag = { ...latestTag, patch: latestTag.patch + 1 };
+  const nextTag = { ...latestTag, patch: parseInt(latestTag.patch) + 1 };
   console.log(`Next Tag: ${tagObjectToString(nextTag)}`);
   return tagObjectToString(nextTag);
 }
