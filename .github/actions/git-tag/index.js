@@ -9,9 +9,13 @@ async function run() {
     });
     let { owner, name: repo, tags_url } = github.context.payload.repository;
     owner = owner.login;
+    core.startGroup("Calculating Next Tag");
     console.log(`Repo Owner: ${JSON.stringify(owner)} - Repo Name: ${repo}`);
     const nextTag = await getNextTag(owner, repo);
     core.setOutput("docker-tag", `${image}:${nextTag}`);
+    core.endGroup();
+    core.startGroup("Creating and Pushing Git Tag");
+    core.endGroup();
   } catch (error) {
     core.setFailed(error);
   }
