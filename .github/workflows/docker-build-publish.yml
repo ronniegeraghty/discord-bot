@@ -49,6 +49,8 @@ jobs:
         uses: ./.github/actions/git-tag
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+      - name: Check Docker tag
+        run: echo ${{steps.create_tag.outputs.docker-tag}}
 
       # Run Docker build
       - name: Run Docker Build & Publish

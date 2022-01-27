@@ -3,13 +3,15 @@ const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
 
 async function run() {
-  console.log("🚀 ~ file: index.js ~ line 6 ~ run ~ run", run);
   try {
+    const image = core.getInput("image", {
+      required: true,
+    });
     let { owner, name: repo, tags_url } = github.context.payload.repository;
     owner = owner.login;
     console.log(`OWNER: ${JSON.stringify(owner)} - NAME: ${repo}`);
-
-    core.setOutput("docker-tag", await getLatestTag(owner, repo));
+    const latestTag = await getLatestTag(owner, repo);
+    core.setOutput("docker-tag", `${image}:${latestTag}`);
   } catch (error) {
     core.setFailed(error);
   }
