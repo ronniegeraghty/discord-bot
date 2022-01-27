@@ -5,7 +5,7 @@ RUN apk add git
 
 WORKDIR /development/
 ADD package.json .
-#RUN npm install
+RUN npm install
 ADD . .
 #Run Post NPM Install Fixes
 RUN chmod +x ci/postInstallFixes.sh
