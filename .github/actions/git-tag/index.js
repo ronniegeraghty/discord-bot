@@ -28,6 +28,7 @@ async function getLatestTag(owner, repo) {
     repo: repo,
     per_page: 100,
   });
+  console.log("🚀 ~ file: index.js ~ line 31 ~ getLatestTag ~ pages", pages);
   const tags = [];
   for await (const item of getItemsFromPages(pages)) {
     const tag = item["name"];
