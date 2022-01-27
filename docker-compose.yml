@@ -21,7 +21,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/ronniegeraghty/discord-bot:2.0.4
+    image: ghcr.io/ronniegeraghty/discord-bot:2.0.4-fix1
   mongodb:
     container_name: mongodb-discord-bot
     image: mongo:5.0.2

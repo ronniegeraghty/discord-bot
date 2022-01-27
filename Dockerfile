@@ -5,7 +5,7 @@ RUN apk add git
 
 WORKDIR /development/
 ADD package.json .
-RUN npm install
+#RUN npm install
 ADD . .
 #Run Post NPM Install Fixes
 RUN chmod +x ci/postInstallFixes.sh
@@ -30,7 +30,7 @@ WORKDIR /app/
 RUN apk add --no-cache git
 RUN apk add --no-cache ffmpeg
 COPY --from=ts-compiler /development/package*.json ./
-#COPY --from=ts-compiler /dev/node_modules/ ./node_modules/
+#COPY --from=ts-compiler /development/node_modules/ ./node_modules/
 RUN npm cache clean --force
 RUN npm ci --only=prod
 #Run Post NPM Install Fixes

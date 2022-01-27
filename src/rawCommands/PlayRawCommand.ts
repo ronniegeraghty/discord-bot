@@ -5,7 +5,7 @@ const prefix = process.env.PREFIX;
 
 class PlayRawCommand extends RawCommand {
   public constructor() {
-    super("play");
+    super("play-distube");
   }
   async execute(message: Message<boolean>): Promise<void> {
     const args = message.content.slice(prefix.length).trim().split(" ");
