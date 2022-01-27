@@ -6,7 +6,7 @@ async function run() {
   try {
     let { owner, name, tags_url } = github.context.payload.repository;
     //owner = owner.name;
-    console.log(`OWNER: ${owner} - NAME: ${name}`);
+    console.log(`OWNER: ${JSON.stringify(owner)} - NAME: ${name}`);
     const repo = name;
     core.setOutput("docker-tag", await getLatestTag(owner, repo));
   } catch (error) {
