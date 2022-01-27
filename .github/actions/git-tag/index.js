@@ -9,8 +9,8 @@ async function run() {
     });
     let { owner, name: repo, tags_url } = github.context.payload.repository;
     owner = owner.login;
-    console.log(`OWNER: ${JSON.stringify(owner)} - NAME: ${repo}`);
-    const latestTag = await getLatestTag(owner, repo);
+    console.log(`Repo Owner: ${JSON.stringify(owner)} - Repo Name: ${repo}`);
+    const nextTag = await getNextTag(owner, repo);
     core.setOutput("docker-tag", `${image}:${latestTag}`);
   } catch (error) {
     core.setFailed(error);
@@ -19,16 +19,15 @@ async function run() {
 
 const octokit = new Octokit({ auth: null });
 
-async function getLatestTag(owner, repo) {
+async function getNextTag(owner, repo) {
   // collect repo tags
   const tags = await getTags(owner, repo);
   //sort repo tags for latest version tag
-  const latestTag = sortTags(tags);
-  console.log(
-    "🚀 ~ file: index.js ~ line 25 ~ getLatestTag ~ latestTag",
-    latestTag
-  );
-  return latestTag;
+  const latestTag = await sortTags(tags);
+  console.log(`Latest Tag: ${latestTag}`);
+  const nextTag = { ...latestTag, patch: latestTag.patch + 1 };
+  console.log(`Next Tag: ${nextTag}`);
+  return nextTag;
 }
 async function getTags(owner, repo) {
   const endpoint = octokit.rest.repos.listTags;
@@ -43,26 +42,13 @@ async function getTags(owner, repo) {
       tags.push(item.name);
     }
   }
-  console.log(`TAGS: ${tags}`);
   return tags;
 }
 async function sortTags(tags) {
   let tagObs = [];
   for (const tag of tags) {
-    const splitTag = tag.split(".");
-    if (splitTag.length < 3) {
-      console.log("Tag not formatted properly, tag: ", tag);
-    } else {
-      const tagOb = {
-        major:
-          splitTag[0].substring(0, 1) === "v"
-            ? splitTag[0].substring(1)
-            : splitTag[0],
-        minor: splitTag[1],
-        patch: splitTag[2],
-      };
-      tagObs.push(tagOb);
-    }
+    const tagOb = convertTagStringToTagObject(tag);
+    tagObs.push(tagOb);
   }
   let newestTag;
   for (const tagOb of tagObs) {
@@ -80,7 +66,23 @@ async function sortTags(tags) {
       }
     }
   }
-  return `${newestTag.major}.${newestTag.minor}.${newestTag.patch}`;
+  return newestTag;
+}
+function convertTagStringToTagObject(tag) {
+  const splitTag = tag.split(".");
+  if (splitTag.length < 3) {
+    console.log("Tag not formatted properly, tag: ", tag);
+    return undefined;
+  } else {
+    return {
+      major:
+        splitTag[0].substring(0, 1) === "v"
+          ? splitTag[0].substring(1)
+          : splitTag[0],
+      minor: splitTag[1],
+      patch: splitTag[2],
+    };
+  }
 }
 
 if (require.main === module) {
