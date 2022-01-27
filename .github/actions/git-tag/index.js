@@ -36,27 +36,29 @@ async function getLatestTag(owner, repo) {
     "🚀 ~ file: index.js ~ line 31 ~ getLatestTag ~ pages",
     JSON.stringify(pages)
   );
-  const tags = [];
-  for await (const item of getItemsFromPages(pages)) {
-    const tag = item["name"];
-    tags.push(tag);
-    return tag;
-  }
+  const tags = getItemsFromPages(pages);
+  //   for await (const item of getItemsFromPages(pages)) {
+  //     const tag = item["name"];
+  //     tags.push(tag);
+  //     return tag;
+  //   }
   console.log(`TAGS: ${tags}`);
   return tags[0];
 }
 
-async function* getItemsFromPages(pages) {
+async function getItemsFromPages(pages) {
   console.log(
     "🚀 ~ file: index.js ~ line 39 ~ function*getItemsFromPages ~ getItemsFromPages",
     getItemsFromPages
   );
+  const tags = [];
   for await (const page of octokit.paginate.iterator(pages)) {
     for (const item of page.data) {
       console.log(`DATA: ${item.name}`);
-      return item;
+      tags.push(item.name);
     }
   }
+  return tags;
 }
 
 if (require.main === module) {
