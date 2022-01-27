@@ -5,10 +5,10 @@ const { Octokit } = require("@octokit/rest");
 async function run() {
   console.log("🚀 ~ file: index.js ~ line 6 ~ run ~ run", run);
   try {
-    let { owner, name, tags_url } = github.context.payload.repository;
+    let { owner, name: repo, tags_url } = github.context.payload.repository;
     owner = owner.login;
-    console.log(`OWNER: ${JSON.stringify(owner)} - NAME: ${name}`);
-    const repo = name;
+    console.log(`OWNER: ${JSON.stringify(owner)} - NAME: ${repo}`);
+
     core.setOutput("docker-tag", await getLatestTag(owner, repo));
   } catch (error) {
     core.setFailed(error);
@@ -18,47 +18,64 @@ async function run() {
 const octokit = new Octokit({ auth: null });
 
 async function getLatestTag(owner, repo) {
+  // collect repo tags
+  const tags = await getTags(owner, repo);
+  //sort repo tags for latest version tag
+  const latestTag = sortTags(tags);
   console.log(
-    "🚀 ~ file: index.js ~ line 21 ~ getLatestTag ~ getLatestTag",
-    getLatestTag
+    "🚀 ~ file: index.js ~ line 25 ~ getLatestTag ~ latestTag",
+    latestTag
   );
+  return latestTag;
+}
+async function getTags(owner, repo) {
   const endpoint = octokit.rest.repos.listTags;
-  console.log(
-    "🚀 ~ file: index.js ~ line 26 ~ getLatestTag ~ endpoint",
-    endpoint
-  );
   const pages = endpoint.endpoint.merge({
     owner: owner,
     repo: repo,
     per_page: 100,
   });
-  console.log(
-    "🚀 ~ file: index.js ~ line 31 ~ getLatestTag ~ pages",
-    JSON.stringify(pages)
-  );
-  const tags = await getItemsFromPages(pages);
-  //   for await (const item of getItemsFromPages(pages)) {
-  //     const tag = item["name"];
-  //     tags.push(tag);
-  //     return tag;
-  //   }
-  console.log(`TAGS: ${tags}`);
-  return tags[0];
-}
-
-async function getItemsFromPages(pages) {
-  console.log(
-    "🚀 ~ file: index.js ~ line 39 ~ function*getItemsFromPages ~ getItemsFromPages",
-    getItemsFromPages
-  );
   const tags = [];
   for await (const page of octokit.paginate.iterator(pages)) {
     for (const item of page.data) {
-      console.log(`DATA: ${item.name}`);
       tags.push(item.name);
     }
   }
+  console.log(`TAGS: ${tags}`);
   return tags;
+}
+async function sortTags(tags) {
+  let tagObs = [];
+  for (const tag of tags) {
+    const splitTag = tag.split(".");
+    if (splitTag.length < 3) {
+      console.log("Tag not formatted properly, tag: ", tag);
+    } else {
+      const tagOb = {
+        major: splitTag[0],
+        minor: splitTag[1],
+        patch: splitTag[2],
+      };
+      tagObs.push(tagOb);
+    }
+  }
+  let newestTag;
+  for (const tagOb of tagObs) {
+    if (newestTag === undefined) {
+      newestTag = tagOb;
+    } else if (tagOb.major > newestTag.major) {
+      newestTag = tagOb;
+    } else if (tagOb.major === newestTag.major) {
+      if (tagOb.minor > newestTag.minor) {
+        newestTag = tagOb;
+      } else if (tagOb.minor === newestTag.minor) {
+        if (tagOb.patch > newestTag.patch) {
+          newestTag = tagOb;
+        }
+      }
+    }
+  }
+  return `${newestTag.major}.${newestTag.minor}.${newestTag.patch}`;
 }
 
 if (require.main === module) {
