@@ -36,7 +36,7 @@ async function getLatestTag(owner, repo) {
     "🚀 ~ file: index.js ~ line 31 ~ getLatestTag ~ pages",
     JSON.stringify(pages)
   );
-  const tags = getItemsFromPages(pages);
+  const tags = await getItemsFromPages(pages);
   //   for await (const item of getItemsFromPages(pages)) {
   //     const tag = item["name"];
   //     tags.push(tag);
