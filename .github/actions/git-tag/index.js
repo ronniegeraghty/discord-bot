@@ -17,7 +17,7 @@ async function run() {
     core.setOutput("docker-tag", `${image}:${nextTag}`);
     core.endGroup();
     core.startGroup("Creating and Pushing Git Tag");
-    gitTagAndPush();
+    gitTagAndPush(`v${nextTag}`);
     core.endGroup(nextTag);
   } catch (error) {
     core.setFailed(error);
