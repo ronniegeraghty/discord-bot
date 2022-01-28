@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
+const packageJSON = require("./package.json");
 
 async function run() {
   try {
@@ -46,6 +47,8 @@ async function getTags(owner, repo) {
       tags.push(item.name);
     }
   }
+  tags.push(getPackageJSONVersion());
+  console.log(`Tags: ${tags}`);
   return tags;
 }
 async function sortTags(tags) {
@@ -90,6 +93,9 @@ function convertTagStringToTagObject(tag) {
 }
 function tagObjectToString(tag) {
   return `${tag.major}.${tag.minor}.${tag.patch}`;
+}
+function getPackageJSONVersion() {
+  return `packageJSON.version`;
 }
 if (require.main === module) {
   run();
