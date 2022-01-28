@@ -100,8 +100,8 @@ function getPackageJSONVersion() {
   return `v${packageJSON.version}`;
 }
 function gitTagAndPush(tag) {
-  console.log(`CWD: ${process.cwd}`);
-  const git = simpleGit({ baseDir: process.cwd, binary: "git" });
+  console.log(`CWD: ${process.cwd()}`);
+  const git = simpleGit({ baseDir: process.cwd(), binary: "git" });
   git.tag(tag);
   git.pushTag("origin");
 }
