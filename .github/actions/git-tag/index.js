@@ -95,7 +95,7 @@ function tagObjectToString(tag) {
   return `${tag.major}.${tag.minor}.${tag.patch}`;
 }
 function getPackageJSONVersion() {
-  return `packageJSON.version`;
+  return `v${packageJSON.version}`;
 }
 if (require.main === module) {
   run();
