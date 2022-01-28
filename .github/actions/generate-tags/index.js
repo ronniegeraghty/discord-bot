@@ -9,7 +9,7 @@ async function run() {
     const image = core.getInput("image", {
       required: true,
     });
-    let { owner, name: repo, tags_url } = github.context.payload.repository;
+    let { owner, name: repo } = github.context.payload.repository;
     owner = owner.login;
     core.startGroup("Calculating Next Tag");
     console.log(`Repo Owner: ${JSON.stringify(owner)} - Repo Name: ${repo}`);
@@ -102,12 +102,6 @@ function tagObjectToString(tag) {
 }
 function getPackageJSONVersion() {
   return `v${packageJSON.version}`;
-}
-function gitTagAndPush(tag) {
-  console.log(`CWD: ${process.cwd()}`);
-  const git = simpleGit({ baseDir: process.cwd(), binary: "git" });
-  git.tag(tag);
-  git.push("origin", "--tags");
 }
 if (require.main === module) {
   run();

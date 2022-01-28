@@ -49,8 +49,11 @@ jobs:
         uses: ./.github/actions/generate-tags
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
-      - name: Check Docker tag
-        run: echo ${{steps.generate-tags.outputs.docker-tag}}
+      - name: Push New Git Tag
+        uses: actions-ecosystem/action-push-tag@v1
+        with:
+          tag: ${{ steps.generate-tags.outputs.git-tag }}
+          message: "${{ steps.generate-tags.outputs.git-tag }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
 
       # Run Docker build
       - name: Run Docker Build & Publish
