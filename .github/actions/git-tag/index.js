@@ -1,7 +1,7 @@
 const core = require("@actions/core");
 const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
-const packageJSON = require("./package.json");
+const packageJSON = require("../../../package.json");
 
 async function run() {
   try {
