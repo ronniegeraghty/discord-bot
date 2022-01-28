@@ -2,6 +2,7 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
 const packageJSON = require("../../../package.json");
+const simpleGit = require("simple-git");
 
 async function run() {
   try {
@@ -16,7 +17,8 @@ async function run() {
     core.setOutput("docker-tag", `${image}:${nextTag}`);
     core.endGroup();
     core.startGroup("Creating and Pushing Git Tag");
-    core.endGroup();
+    gitTagAndPush();
+    core.endGroup(nextTag);
   } catch (error) {
     core.setFailed(error);
   }
@@ -96,6 +98,12 @@ function tagObjectToString(tag) {
 }
 function getPackageJSONVersion() {
   return `v${packageJSON.version}`;
+}
+function gitTagAndPush(tag) {
+  console.log(`CWD: ${process.cwd}`);
+  const git = simpleGit({ baseDir: process.cwd, binary: "git" });
+  git.tag(tag);
+  git.pushTag("origin");
 }
 if (require.main === module) {
   run();
