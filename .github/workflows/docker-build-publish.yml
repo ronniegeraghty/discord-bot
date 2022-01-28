@@ -44,13 +44,13 @@ jobs:
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       #Tag the main branch and push the tag, also generates output to use as docker tag
-      - name: Git Tag & Push
-        id: create_tag
-        uses: ./.github/actions/git-tag
+      - name: Create next Git & Docker Tag
+        id: generate-tags
+        uses: ./.github/actions/generate-tags
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
       - name: Check Docker tag
-        run: echo ${{steps.create_tag.outputs.docker-tag}}
+        run: echo ${{steps.generate-tags.outputs.docker-tag}}
 
       # Run Docker build
       - name: Run Docker Build & Publish
@@ -59,7 +59,7 @@ jobs:
         with:
           push: ${{env.PUSH_PACKAGES}}
           context: .
-          tags: ${{steps.create_tag.output.docker_tag}}
+          tags: ${{steps.generate-tags.output.docker-tag}}
 
       - name: Image digest
         run: echo ${{steps.docker_build.outputs.digest}}

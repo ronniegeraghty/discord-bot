@@ -14,11 +14,11 @@ async function run() {
     core.startGroup("Calculating Next Tag");
     console.log(`Repo Owner: ${JSON.stringify(owner)} - Repo Name: ${repo}`);
     const nextTag = await getNextTag(owner, repo);
-    core.setOutput("docker-tag", `${image}:${nextTag}`);
     core.endGroup();
-    core.startGroup("Creating and Pushing Git Tag");
-    gitTagAndPush(`v${nextTag}`);
-    core.endGroup(nextTag);
+    core.startGroup("Generating Tag Outputs");
+    core.setOutput("docker-tag", `${image}:${nextTag}`);
+    core.setOutput("git-tag", `v${nextTag}`);
+    core.endGroup();
   } catch (error) {
     core.setFailed(error);
   }

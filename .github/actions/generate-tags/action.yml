@@ -8,8 +8,10 @@ inputs:
   #   description: "API auth token for GitHub with access to tags api."
   #   required: true
 outputs:
-  docker_tag: # id of output
-    description: "tag for the docker container"
+  docker-tag: # id of output
+    description: "Tag for the docker container"
+  git-tag:
+    description: "Tag for git"
 runs:
   using: "node16"
   main: "index.js"
