@@ -16,8 +16,12 @@ async function run() {
     const nextTag = await getNextTag(owner, repo);
     core.endGroup();
     core.startGroup("Generating Tag Outputs");
-    core.setOutput("docker-tag", `${image}:${nextTag}`);
-    core.setOutput("git-tag", `v${nextTag}`);
+    const dockerTag = `${image}:${nextTag}`;
+    console.log(`Docker Tag: ${dockerTag}`);
+    core.setOutput("docker-tag", dockerTag);
+    const gitTag = `v${nextTag}`;
+    console.log(`Git Tag: ${gitTag}`);
+    core.setOutput("git-tag", gitTag);
     core.endGroup();
   } catch (error) {
     core.setFailed(error);
