@@ -45,11 +45,13 @@ jobs:
 
       #Tag the main branch and push the tag, also generates output to use as docker tag
       - name: Create next Git & Docker Tag
+        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         id: generate-tags
         uses: ./.github/actions/generate-tags
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
       - name: Push New Git Tag
+        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         uses: actions-ecosystem/action-push-tag@v1
         with:
           tag: ${{ steps.generate-tags.outputs.git-tag }}
