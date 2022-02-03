@@ -1,3 +1,0 @@
-[submodule ".github/actions/action-push-tag"]
-	path = .github/actions/action-push-tag
-	url = https://github.com/ronniegeraghty/action-push-tag.git
