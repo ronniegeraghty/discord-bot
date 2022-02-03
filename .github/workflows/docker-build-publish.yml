@@ -27,6 +27,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          submodules: true
 
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
@@ -47,7 +49,7 @@ jobs:
 
       # Generate the next semanict version tag for git and docker
       - name: Create next Git & Docker Tag
-        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         id: generate-tags
         uses: ./.github/actions/generate-tags
         with:
@@ -56,7 +58,7 @@ jobs:
       # Tag and Push the Git Branch
       - name: Push New Git Tag
         #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: ronniegeraghty/action-push-tag@main
+        uses: ./.github/actions/action-push-tag
         with:
           tag: ${{ steps.generate-tags.outputs.git-tag }}
           message: "${{ steps.generate-tags.outputs.git-tag }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
