@@ -59,7 +59,8 @@ jobs:
         id: git-tag-push
         uses: ./.github/actions/git-tag-push
         with:
-          tag: ${{steps.generate-tags.output.git-tag}}
+          tag: tests
+          #${{steps.generate-tags.output.git-tag}}
           github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       # Run Docker build
