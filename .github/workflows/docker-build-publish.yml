@@ -53,8 +53,6 @@ jobs:
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
 
-      - run: echo ${{steps.gen-tags.outputs.git-tag}}
-
       # Tag the branch and Push the Tag to Github
       - name: Git Tag & Push
         #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
