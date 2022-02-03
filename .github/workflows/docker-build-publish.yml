@@ -55,11 +55,12 @@ jobs:
 
       # Tag and Push the Git Branch
       - name: Push New Git Tag
-        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: actions-ecosystem/action-push-tag@v1
+        #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        uses: ./.github/actions/action-push-tag
         with:
           tag: ${{ steps.generate-tags.outputs.git-tag }}
           message: "${{ steps.generate-tags.outputs.git-tag }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
+          signed: true
 
       # Run Docker build
       - name: Run Docker Build & Publish
