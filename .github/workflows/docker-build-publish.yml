@@ -55,29 +55,6 @@ jobs:
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
 
-      - name: Push Git Tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.0
-        with:
-          github_token: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
-          custom_tag: ${{steps.generate-tags.outputs.git-tag}}
-
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
-
-      # Tag and Push the Git Branch
-      - name: Push New Git Tag
-        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: ./.github/actions/action-push-tag
-        with:
-          tag: ${{ steps.generate-tags.outputs.git-tag }}
-          message: "${{ steps.generate-tags.outputs.git-tag }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
-          signed: true
-
       # Run Docker build
       - name: Run Docker Build & Publish
         id: docker_build
