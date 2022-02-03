@@ -3,6 +3,7 @@ const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
 const packageJSON = require("../../../package.json");
 const simpleGit = require("simple-git");
+const { GitHub } = require("@actions/github/lib/utils");
 
 async function run() {
   try {
@@ -24,7 +25,7 @@ async function run() {
     core.setOutput("git-tag", gitTag);
     core.endGroup();
     core.startGroup("Testing");
-    const oct = new github.GitHub();
+    const oct = new GitHub();
     const createTag = await oct.git.createTag({
       owner: owner,
       repo: repo,
