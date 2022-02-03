@@ -4,9 +4,9 @@ inputs:
   image: # id of input
     description: "registry/container-name"
     required: true
-  # github_auth:
-  #   description: "API auth token for GitHub with access to tags api."
-  #   required: true
+  githu-auth:
+    description: "API auth token for GitHub with access to tags api."
+    required: true
 outputs:
   docker-tag: # id of output
     description: "Tag for the docker container"

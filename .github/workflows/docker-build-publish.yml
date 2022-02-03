@@ -54,6 +54,7 @@ jobs:
         uses: ./.github/actions/generate-tags
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+          github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       # Tag and Push the Git Branch
       - name: Push New Git Tag
