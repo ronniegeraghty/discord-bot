@@ -7,7 +7,7 @@ async function run() {
     const [owner, repo] = process.env.GITHUB_REPOSITORY.split("/");
     const octo = github.getOctokit(token);
     const response = await octo.request("POST /repos/{owner}/{repo}/git/tags", {
-      owner: dingle,
+      owner: "dingle",
       repo: repo,
       tag: tag,
       message: "Test message",
