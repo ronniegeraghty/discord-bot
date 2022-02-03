@@ -23,6 +23,22 @@ async function run() {
     console.log(`Git Tag: ${gitTag}`);
     core.setOutput("git-tag", gitTag);
     core.endGroup();
+    core.startGroup("Testing");
+    const oct = new github.GitHub();
+    const createTag = await oct.git.createTag({
+      owner: owner,
+      repo: repo,
+      tag: nextTag,
+      message: "test message",
+      object: process.env.GITHUB_SHA,
+      type: "commit",
+    });
+    if (createTag.status !== 201) {
+      core.setFailed(
+        `Could not create tag. Recieved ${createTag.status} from API`
+      );
+    }
+    core.endGroup();
   } catch (error) {
     core.setFailed(error);
   }
