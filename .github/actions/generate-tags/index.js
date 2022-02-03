@@ -10,7 +10,6 @@ async function run() {
     const image = core.getInput("image", {
       required: true,
     });
-    const token = core.getInput("github-auth", { required: true });
     let { owner, name: repo } = github.context.payload.repository;
     owner = owner.login;
     core.startGroup("Calculating Next Tag");
