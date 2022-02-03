@@ -26,7 +26,7 @@ async function run() {
     core.setOutput("git-tag", gitTag);
     core.endGroup();
     core.startGroup("Testing");
-    const oct = new GitHub(token);
+    const oct = new github.getOctokit(token);
     const createTag = await oct.git.createTag({
       owner: owner,
       repo: repo,
