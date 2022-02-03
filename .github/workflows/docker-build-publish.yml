@@ -48,12 +48,12 @@ jobs:
       # Generate the next semanict version tag for git and docker
       - name: Generate Tags
         #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        id: generate-tags
+        id: gen-tags
         uses: ./.github/actions/generate-tags
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
 
-      - run: echo ${{steps.generate-tags.output.git-tag}}
+      - run: echo ${{steps.gen-tags.output.git-tag}}
 
       # Tag the branch and Push the Tag to Github
       - name: Git Tag & Push
@@ -61,7 +61,7 @@ jobs:
         id: git-tag-push
         uses: ./.github/actions/git-tag-push
         with:
-          tag: ${{steps.generate-tags.output.git-tag}}
+          tag: ${{steps.gen-tags.output.git-tag}}
           github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       # Run Docker build
@@ -71,4 +71,4 @@ jobs:
         with:
           push: ${{env.PUSH_PACKAGES}}
           context: .
-          tags: ${{steps.generate-tags.output.docker-tag}}
+          tags: ${{steps.gen-tags.output.docker-tag}}
