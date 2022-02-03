@@ -18,7 +18,7 @@ async function run() {
     const dockerTag = `${image}:${nextTag}`;
     console.log(`Docker Tag: ${dockerTag}`);
     core.setOutput("docker-tag", dockerTag);
-    const gitTag = `${nextTag}`;
+    const gitTag = `v${nextTag}`;
     console.log(`Git Tag: ${gitTag}`);
     core.setOutput("git-tag", gitTag);
     core.endGroup();

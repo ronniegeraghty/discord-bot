@@ -27,8 +27,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
         uses: actions/checkout@v2
-        with:
-          submodules: true
 
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
@@ -48,12 +46,21 @@ jobs:
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       # Generate the next semanict version tag for git and docker
-      - name: Create next Git & Docker Tag
+      - name: Generate Tags
         #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         id: generate-tags
         uses: ./.github/actions/generate-tags
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+
+      # Tag the branch and Push the Tag to Github
+      - name: Git Tag & Push
+        #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        id: git-tag-push
+        uses: ./.github/actions/git-tag-push
+        with:
+          tag: ${{steps.generate-tags.output.git-tag}}
+          github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       # Run Docker build
       - name: Run Docker Build & Publish

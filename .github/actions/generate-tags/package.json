@@ -1,5 +1,5 @@
 {
-  "name": "create-docker-tag",
+  "name": "generate-tags",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

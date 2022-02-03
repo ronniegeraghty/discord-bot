@@ -1,5 +1,5 @@
-name: "Git Tag & Push Tag"
-description: "Tags the branch with next Patch version number, pushes the tag and generates a docker tag."
+name: "Generate Tags"
+description: "Generate tags for git and docker"
 inputs:
   image: # id of input
     description: "registry/container-name"
