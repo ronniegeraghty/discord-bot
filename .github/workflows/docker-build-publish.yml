@@ -53,14 +53,15 @@ jobs:
         with:
           image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
 
+      - run: echo ${{steps.generate-tags.output.git-tag}}
+
       # Tag the branch and Push the Tag to Github
       - name: Git Tag & Push
         #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
         id: git-tag-push
         uses: ./.github/actions/git-tag-push
         with:
-          tag: tests
-          #${{steps.generate-tags.output.git-tag}}
+          tag: ${{steps.generate-tags.output.git-tag}}
           github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
       # Run Docker build
