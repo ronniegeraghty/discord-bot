@@ -56,7 +56,7 @@ jobs:
       # Tag and Push the Git Branch
       - name: Push New Git Tag
         #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        uses: ./.github/actions/action-push-tag
+        uses: ronniegeraghty/action-push-tag@main
         with:
           tag: ${{ steps.generate-tags.outputs.git-tag }}
           message: "${{ steps.generate-tags.outputs.git-tag }}: PR #${{ github.event.pull_request.number }} ${{ github.event.pull_request.title }}"
