@@ -2,8 +2,6 @@ const core = require("@actions/core");
 const github = require("@actions/github");
 const { Octokit } = require("@octokit/rest");
 const packageJSON = require("../../../package.json");
-const simpleGit = require("simple-git");
-const { GitHub } = require("@actions/github/lib/utils");
 
 async function run() {
   try {
@@ -20,7 +18,7 @@ async function run() {
     const dockerTag = `${image}:${nextTag}`;
     console.log(`Docker Tag: ${dockerTag}`);
     core.setOutput("docker-tag", dockerTag);
-    const gitTag = `v${nextTag}`;
+    const gitTag = `${nextTag}`;
     console.log(`Git Tag: ${gitTag}`);
     core.setOutput("git-tag", gitTag);
     core.endGroup();
