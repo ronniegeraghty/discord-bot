@@ -18,7 +18,7 @@ async function run() {
         tagger: {
           name: "Ronnie Geraghty",
           email: "ronniegerag@gmail.com",
-          date: Date.now(),
+          date: Date.now().toISOString(),
         },
       }
     );
