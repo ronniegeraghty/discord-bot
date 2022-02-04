@@ -22,7 +22,7 @@ async function run() {
         },
       }
     );
-    if (response.status !== 201) {
+    if (tagResponse.status !== 201) {
       core.setFailed(`Error Creating Tag:`);
     }
     console.log(`Create Tage RESPONSE: ${JSON.stringify(tagResponse)}`);
