@@ -9,7 +9,7 @@ async function run() {
     const tagResponse = await octo.request(
       "POST /repos/{owner}/{repo}/git/tags",
       {
-        owner: ownwer,
+        owner: owner,
         repo: repo,
         tag: tag,
         message: "Test message",
