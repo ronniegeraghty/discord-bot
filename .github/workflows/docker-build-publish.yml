@@ -61,6 +61,19 @@ jobs:
           tag: ${{steps.gen-tags.outputs.git-tag}}
           github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
+      #Create a GitHub Release from tag
+      - name: Create Release
+        #if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{steps.gen-tags.outputs.git-tag}}
+          release_name: Release ${{github.ref}}
+          body: test
+          draft: false
+          prerelease: false
+
       # Run Docker build
       - name: Run Docker Build & Publish
         id: docker_build
