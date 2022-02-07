@@ -46,7 +46,7 @@ jobs:
 
       # Generate the next semanict version tag for git and docker
       - name: Generate Tags
-        if: ${{env.PUSH_PACKAGES}}
+        if: ${{env.PUSH_PACKAGES == true}}
         id: gen-tags
         uses: ./.github/actions/generate-tags
         with:
@@ -54,7 +54,7 @@ jobs:
 
       # Tag the branch and Push the Tag to Github
       - name: Git Tag & Push
-        if: ${{env.PUSH_PACKAGES}}
+        if: ${{env.PUSH_PACKAGES == true}}
         id: git-tag-push
         uses: ./.github/actions/git-tag-push
         with:
@@ -63,7 +63,7 @@ jobs:
 
       #Create a GitHub Release from tag
       - name: Create Release
-        if: ${{env.PUSH_PACKAGES}}
+        if: ${{env.PUSH_PACKAGES == true}}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
