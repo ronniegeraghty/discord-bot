@@ -1,3 +1,4 @@
+#TODO: Add abiliit to create release from new tag
 # This is a basic workflow to help you get started with Actions
 name: Docker Build & Publish
 # Controls when the workflow will run
@@ -25,38 +26,52 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
         uses: actions/checkout@v2
-      # Check PUSH_PACKAGE variable
-      - name: Check PUSH_PACKAGE
-        run: echo ${{env.PUSH_PACKAGES}}
+
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
+
       # Set up Docker Buildx
       - name: Set Up Docker Buildx
         uses: docker/setup-buildx-action@v1
+
       # Login to GHCR
       - name: Login to GitHub Container Registry
-        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
+        if: ${{env.PUSH_PACKAGES}}
         uses: docker/login-action@v1
         with:
           registry: ${{env.REGISTRY}}
           username: ${{github.actor}}
           password: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
 
-      #Tag and push tag
-      - name: Tag and push tag
-        if: ${{github.event_name == 'push' && github.ref == 'refs/heads/main'}}
-        run: |
-          git tag v2.0.6
-          git push origin v2.0.6
-      #Use metadata to create image tag
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v3
+      # Generate the next semanict version tag for git and docker
+      - name: Generate Tags
+        if: ${{env.PUSH_PACKAGES == true}}
+        id: gen-tags
+        uses: ./.github/actions/generate-tags
         with:
-          images: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
-          tags: |
-            type=semver,pattern={{version}}
+          image: ${{env.REGISTRY}}/${{env.IMAGE_NAME}}
+
+      # Tag the branch and Push the Tag to Github
+      - name: Git Tag & Push
+        if: ${{env.PUSH_PACKAGES == true}}
+        id: git-tag-push
+        uses: ./.github/actions/git-tag-push
+        with:
+          tag: ${{steps.gen-tags.outputs.git-tag}}
+          github-auth: ${{secrets.GHCR_PUBLISH_FROM_ACTIONS_TOKEN}}
+
+      #Create a GitHub Release from tag
+      - name: Create Release
+        if: ${{env.PUSH_PACKAGES == true}}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        with:
+          tag_name: ${{steps.gen-tags.outputs.git-tag}}
+          release_name: Release ${{steps.gen-tags.outputs.git-tag}}
+          draft: false
+          prerelease: false
 
       # Run Docker build
       - name: Run Docker Build & Publish
@@ -65,6 +80,4 @@ jobs:
         with:
           push: ${{env.PUSH_PACKAGES}}
           context: .
-          tags: ${{steps.meta.outputs.tags}}
-      - name: Image digest
-        run: echo ${{steps.docker_build.outputs.digest}}
+          tags: ${{steps.gen-tags.output.docker-tag}}

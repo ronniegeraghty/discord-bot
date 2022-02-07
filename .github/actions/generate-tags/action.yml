@@ -1,0 +1,20 @@
+name: "Generate Tags"
+description: "Generate tags for git and docker"
+inputs:
+  image: # id of input
+    description: "registry/container-name"
+    required: true
+  # github-auth:
+  #   description: "API auth token for GitHub with access to tags api."
+  #   required: true
+outputs:
+  docker-tag: # id of output
+    description: "Tag for the docker container"
+  git-tag:
+    description: "Tag for git"
+runs:
+  using: "node16"
+  main: "index.js"
+branding:
+  icon: tag
+  color: blue
