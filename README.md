@@ -4,13 +4,13 @@ A discord bot to run and host yourself to bring music playback to your discord s
 
 ## Contents<!-- omit in toc -->
 
-- [Set Up](#set-up)
+- [Run](#run)
   - [Create Bot Account](#create-bot-account)
   - [RunTime Env](#runtime-env)
   - [Add Slash Commands](#add-slash-commands)
 - [Features](#features)
 
-## Set Up
+## Run
 
 ### Create Bot Account
 
