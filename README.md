@@ -5,33 +5,44 @@ A discord bot to run and host yourself to bring music playback to your discord s
 ## Contents<!-- omit in toc -->
 
 - [Set Up](#set-up)
-  - [Create Bot](#create-bot)
+  - [Create Bot Account](#create-bot-account)
   - [RunTime Env](#runtime-env)
-    - [Container](#container)
-      - [Pull from GHCR](#pull-from-ghcr)
-      - [Build from Source](#build-from-source)
-    - [Node](#node)
-  - [Add Bot to Discord Channel](#add-bot-to-discord-channel)
   - [Add Slash Commands](#add-slash-commands)
 - [Features](#features)
 
 ## Set Up
 
-### Create Bot
+### Create Bot Account
+
+- For steps on how to create a Discord Bot Accont and invite it to your discord server follow the steps here: [Create a Bot Account](https://discordpy.readthedocs.io/en/stable/discord.html)
 
 ### RunTime Env
 
-#### Container
+- Pull from GHCR _(Note: Requires Docker and Docker Compose)_
 
-##### Pull from GHCR
+  - ```shell
+    git clone https://github.com/ronniegeraghty/discord-bot.git
+    cd discord-bot
+    mv .env.example .env
+    ```
 
-##### Build from Source
+  - Edit the .env file with the specifics for your bot. For the Container runtime you'll need to fill out all th eenvironment variables.
 
-#### Node
+  - ```shell
+    docker-compose up
+    ```
 
-To run the bot in a Node.js environment follow these steps. _Note: Requires [Node.js](https://nodejs.org/en/download/) v16 or higher & and MongoDB database._
+- Build from Source _(Note: Requires Docker and Docker Compose)_
 
-- Run the following commands in a terminal.
+  - Follow the same steps as [Pull from GHCR](#pull-from-ghcr) section but use the following `docker-compose` command:
+
+    - ```shell
+      docker-compose up --build
+      ```
+
+- Node
+
+  - To run the bot in a Node.js environment follow these steps. _Note: Requires [Node.js](https://nodejs.org/en/download/) v16 or higher & and MongoDB database._
 
   - ```shell
     git clone https://github.com/ronniegeraghty/discord-bot.git
@@ -42,16 +53,17 @@ To run the bot in a Node.js environment follow these steps. _Note: Requires [Nod
     mv .env.example .env
     ```
 
-- Edit the .env file with the specifics for your bot. For the Node.js runtime you'll only need to fill out the environment variables in the `#Discord Bot Config` & `#Mongo DB Config` sections.
-- Run the start command in the terminal.
+  - Edit the .env file with the specifics for your bot. For the Node.js runtime you'll only need to fill out the environment variables in the `#Discord Bot Config` & `#Mongo DB Config` sections.
 
   - ```shell
     npm run start
     ```
 
-### Add Bot to Discord Channel
-
 ### Add Slash Commands
+
+- Once you can see your discord bot active in your discord server, enter this command in a text channel of the discord server.
+
+- `<prefix>add-slash-commands` Where `<prefix>` is the `PREFIX` environment variable you set.
 
 ## Features
 
