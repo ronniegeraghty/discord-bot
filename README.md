@@ -5,40 +5,28 @@ A discord bot to run and host yourself to bring music playback to your discord s
 ## Contents<!-- omit in toc -->
 
 - [Run](#run)
-  - [Create Bot Account](#create-bot-account)
-  - [RunTime Env](#runtime-env)
   - [Add Slash Commands](#add-slash-commands)
 - [Features](#features)
 
 ## Run
 
-### Create Bot Account
+- Create Bot Account: For steps on how to create a Discord Bot Accont and invite it to your discord server follow the steps here: [Create a Bot Account](https://discordpy.readthedocs.io/en/stable/discord.html)
 
-- For steps on how to create a Discord Bot Accont and invite it to your discord server follow the steps here: [Create a Bot Account](https://discordpy.readthedocs.io/en/stable/discord.html)
+- ```shell
+  git clone https://github.com/ronniegeraghty/discord-bot.git
+  cd discord-bot
+  mv .env.example .env
+  ```
 
-### RunTime Env
+- Edit the .env file with the specifics for your bot. For the Container runtime you'll need to fill out all th environment variables. _For the Node.js runtime you'll only need to fill out the environment variables in the `#Discord Bot Config` & `#Mongo DB Config` sections._
 
-- Pull from GHCR _(Note: Requires Docker and Docker Compose)_
-
-  - ```shell
-    git clone https://github.com/ronniegeraghty/discord-bot.git
-    cd discord-bot
-    mv .env.example .env
-    ```
-
-  - Edit the .env file with the specifics for your bot. For the Container runtime you'll need to fill out all th eenvironment variables.
+- ```shell
+  docker-compose up
+  ```
 
   - ```shell
-    docker-compose up
+    docker-compose up --build
     ```
-
-- Build from Source _(Note: Requires Docker and Docker Compose)_
-
-  - Follow the same steps as [Pull from GHCR](#pull-from-ghcr) section but use the following `docker-compose` command:
-
-    - ```shell
-      docker-compose up --build
-      ```
 
 - Node
 
