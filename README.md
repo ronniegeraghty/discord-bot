@@ -1,6 +1,6 @@
 # discord-bot<!-- omit in toc -->
 
-[![build-and-release](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-release.yml/badge.svg)](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-release.yml)
+[![build-and-release](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-publish.yml/badge.svg)](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-publish.yml)
 
 A discord bot to run and host yourself to bring music playback to your discord server.
 
