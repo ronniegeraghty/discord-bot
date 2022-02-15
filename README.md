@@ -1,6 +1,9 @@
 # discord-bot<!-- omit in toc -->
 
-[![build-and-release](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-release.yml/badge.svg)](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-release.yml)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ronniegeraghty/discord-bot?sort=semver)
+[![build-and-release](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-publish.yml/badge.svg)](https://github.com/ronniegeraghty/discord-bot/actions/workflows/docker-build-publish.yml)
+![GitHub issues](https://img.shields.io/github/issues-raw/ronniegeraghty/discord-bot)
+![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/ronniegeraghty/discord-bot?color=%238957E5)
 
 A discord bot to run and host yourself to bring music playback to your discord server.
 
