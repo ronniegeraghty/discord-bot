@@ -8,6 +8,7 @@ export default class BotClient extends Client {
     public commands: Collection<string, Command>;
     public constructor(token: string) {
         super({ intents: [GatewayIntentBits.Guilds] });
+        this.commands = new Collection<string, Command>();
     }
     public start() {
         console.log("Starting Bot");

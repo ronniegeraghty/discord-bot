@@ -10,6 +10,7 @@ export class Command {
     public data: SlashCommandBuilder;
     public constructor(options: CommandOptions) {
         this.data = new SlashCommandBuilder().setName(options.name).setDescription(options.description);
+        this.execute = options.execute;
     }
     public execute: (Interaction: CommandInteraction) => void;
 }
