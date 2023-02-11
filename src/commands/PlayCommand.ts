@@ -19,7 +19,7 @@ class PlayCommand extends Command {
 		const { member, client, guildId } = interaction;
 		// type check on member and client
 		if (member instanceof GuildMember && client instanceof BotClient) {
-			//TODO
+			//TODO - start here
 		}
 	};
 }
