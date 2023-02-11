@@ -17,5 +17,4 @@ class EchoCommand extends Command {
     await interaction.reply(`${interaction.options.get('input').value.toString()}`);
   };
 }
-
 export default new EchoCommand(); 
