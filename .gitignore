@@ -1,1 +1,4 @@
 archive
+.env
+node_modules
+build
