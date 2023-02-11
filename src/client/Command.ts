@@ -6,11 +6,7 @@ type CommandOptions = {
     description: string,
     execute?: (interaction: CommandInteraction) => void;
 };
-export class Command {
-    public data: SlashCommandBuilder;
-    public constructor(options: CommandOptions) {
-        this.data = new SlashCommandBuilder().setName(options.name).setDescription(options.description);
-        this.execute = options.execute;
-    }
-    public execute: (Interaction: CommandInteraction) => void;
+export abstract class Command {
+    abstract data: SlashCommandBuilder;
+    abstract execute(interaction: CommandInteraction): void;
 }
