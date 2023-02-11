@@ -11,4 +11,5 @@ export class Command {
     public constructor(options: CommandOptions) {
         this.data = new SlashCommandBuilder().setName(options.name).setDescription(options.description);
     }
+    public execute: (Interaction: CommandInteraction) => void;
 }

@@ -30,6 +30,20 @@ export default class BotClient extends Client {
                 console.log(`+ Adding Command: ${command.data.name}`);
             });
         }
+        //add listeners for slash command
+        this.on('interactionCreate', async (interaction) => {
+            if (!interaction.isCommand()) return;
+            const command = this.commands.get(interaction.commandName);
+            if (!command) return;
+            console.log(`Command Triggered: ${interaction.user.tag} triggered command: ${command.data.name}, on Server: ${interaction.guild.name} in channel #${interaction.guild.channels.cache.get(interaction.channelId).name}\n - ${interaction}`);
+            // Try executing the command
+            try {
+                command.execute(interaction);
+            } catch (error) {
+                console.log(`ERROR executing command: ${interaction.commandName} - Error: ${error}`);
+                await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+            }
+        });
     }
     private loadEventListeners() {
         this.on('ready', () => {
