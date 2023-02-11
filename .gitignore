@@ -1,8 +1,1 @@
-.env
-node_modules
-build
-src/Config.ts
-src/config.json
-src-OLD/Config.ts
-package-lock.json
-!.github/actions/**/node_modules
+archive
