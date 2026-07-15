@@ -1,20 +1,17 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import {
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
-  CommandInteraction,
+  ButtonStyle,
+  ChatInputCommandInteraction,
   GuildMember,
-  Interaction,
-  InteractionCollector,
-  MessageActionRow,
-  MessageButton,
-  MessageButtonStyleResolvable,
   MessageComponentInteraction,
+  SlashCommandBuilder,
 } from "discord.js";
 import { CommandType } from "../client/Command";
 import BotClient from "../client/BotClient";
 import MusicSubscription from "../client/Subscription";
 import {
-  DiscordGatewayAdapterCreator,
   entersState,
   joinVoiceChannel,
   VoiceConnectionStatus,
@@ -81,9 +78,7 @@ function createSubscription(
     joinVoiceChannel({
       channelId: channel.id,
       guildId: guildId,
-      //TODO: update below when discordjs and discordjs/voice incompatibility is resolved
-      adapterCreator: channel.guild
-        .voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
+      adapterCreator: channel.guild.voiceAdapterCreator,
     })
   );
   subscription.voiceConnection.on("error", console.warn);
@@ -93,7 +88,7 @@ function createSubscription(
 }
 async function checkVoiceConnectionReady(
   subscription: MusicSubscription,
-  interaction: CommandInteraction
+  interaction: ChatInputCommandInteraction
 ): Promise<boolean> {
   try {
     await entersState(
@@ -112,7 +107,7 @@ async function checkVoiceConnectionReady(
 }
 async function createTrack(
   url: string,
-  interaction: CommandInteraction
+  interaction: ChatInputCommandInteraction
 ): Promise<Track> {
   try {
     const track = await Track.from(url, interaction.user.tag, {
@@ -147,29 +142,29 @@ async function createTrack(
 type PlaybackButtonType = {
   [id: string]: {
     customId: string;
-    style: MessageButtonStyleResolvable;
+    style: ButtonStyle;
     emojiName: string;
   };
 };
 async function sendQueuedMessage(
-  interaction: CommandInteraction,
+  interaction: ChatInputCommandInteraction,
   track: Track
 ) {
   //create playback buttons
   const playbackButtons: PlaybackButtonType = {
     play: {
       customId: "play",
-      style: "PRIMARY",
+      style: ButtonStyle.Primary,
       emojiName: "play",
     },
     pause: {
       customId: "pause",
-      style: "PRIMARY",
+      style: ButtonStyle.Primary,
       emojiName: "pause",
     },
     next: {
       customId: "next",
-      style: "PRIMARY",
+      style: ButtonStyle.Primary,
       emojiName: "next",
     },
   };
@@ -183,13 +178,12 @@ async function sendQueuedMessage(
 }
 function createPlakbackButtons(
   playbackButtons: PlaybackButtonType,
-  interaction: CommandInteraction
+  interaction: ChatInputCommandInteraction
 ) {
-  return new MessageActionRow().addComponents(
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
     Object.keys(playbackButtons).map((key) =>
-      new MessageButton()
+      new ButtonBuilder()
         .setCustomId(key)
-        .setLabel("")
         .setStyle(playbackButtons[key].style)
         .setEmoji(
           `${
@@ -202,7 +196,7 @@ function createPlakbackButtons(
   );
 }
 function createButtonInteractionCollector(
-  interaction: CommandInteraction,
+  interaction: ChatInputCommandInteraction,
   playbackButton: PlaybackButtonType
 ) {
   //extract needed properties from interaction
@@ -219,8 +213,9 @@ function createButtonInteractionCollector(
   const filter = (i: MessageComponentInteraction) =>
     i.customId in playbackButton;
   // Create collector
-  const collector: InteractionCollector<Interaction> =
-    interaction.channel.createMessageComponentCollector({ filter });
+  const collector = interaction.channel.createMessageComponentCollector({
+    filter,
+  });
   // Add collector to client collectors collection
   client.collectors.set(
     `${guildId}.${channelId}.PlayPauseNextButton`,

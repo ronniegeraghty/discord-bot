@@ -3,7 +3,7 @@ import {
   createAudioResource,
   demuxProbe,
 } from "@discordjs/voice";
-import ytdl, { getBasicInfo as getYoutubeInfo } from "ytdl-core";
+import ytdl, { getBasicInfo as getYoutubeInfo } from "@distube/ytdl-core";
 import { Readable } from "stream";
 
 /**
@@ -58,7 +58,11 @@ export default class Track implements TrackData {
       let stream: Readable;
       switch (this.urlType) {
         case "youtube":
-          stream = ytdl(this.url, { filter: "audioonly" });
+          stream = ytdl(this.url, {
+            filter: "audioonly",
+            quality: "highestaudio",
+            highWaterMark: 1 << 25,
+          });
           break;
         default:
           reject();

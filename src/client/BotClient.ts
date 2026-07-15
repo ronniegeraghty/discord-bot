@@ -4,7 +4,6 @@ import {
   Client,
   ClientOptions,
   Collection,
-  Interaction,
   InteractionCollector,
   Message,
 } from "discord.js";
@@ -14,13 +13,12 @@ import { DatabaseOptions } from "../database/DatabaseOptions.type";
 import MusicSubscription from "./Subscription";
 
 export default class BotClient extends Client {
-  public token: string;
   public dbOptions: DatabaseOptions;
   public commands: Collection<string, COMMANDS>;
   public rawCommands: Collection<string, RawCommand>;
   public rawCommandOptions: RawCommandOptions;
   public subscriptions: Collection<string, MusicSubscription>;
-  public collectors: Collection<string, InteractionCollector<Interaction>>;
+  public collectors: Collection<string, InteractionCollector<any>>;
   public constructor(
     token: string,
     dbOptions: DatabaseOptions,
@@ -34,10 +32,7 @@ export default class BotClient extends Client {
     this.rawCommands = new Collection<string, RawCommand>();
     this.rawCommandOptions = rawCommandOptions;
     this.subscriptions = new Collection<string, MusicSubscription>();
-    this.collectors = new Collection<
-      string,
-      InteractionCollector<Interaction>
-    >();
+    this.collectors = new Collection<string, InteractionCollector<any>>();
   }
   public start() {
     console.log("Starting Bot");
@@ -68,7 +63,7 @@ export default class BotClient extends Client {
     }
     //add listener for slash command
     this.on("interactionCreate", async (interaction) => {
-      if (!interaction.isCommand()) return;
+      if (!interaction.isChatInputCommand()) return;
       const command = this.commands.get(interaction.commandName);
       if (!command) return;
       console.log(
@@ -154,31 +149,31 @@ export default class BotClient extends Client {
       });
     }
   }
-  private connectDatabase() {
-    mongoose.connect(
-      `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`,
-      {},
-      (err: Error) => {
-        if (err) throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
-        console.log(`Connected to MongoDB`);
-      }
-    );
+  private async connectDatabase() {
+    try {
+      await mongoose.connect(
+        `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`
+      );
+      console.log(`Connected to MongoDB`);
+    } catch (err) {
+      throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
+    }
   }
   killBot() {
-    process.on("SIGTERM", () => {
+    process.on("SIGTERM", async () => {
       console.info("SIGTERM singal revieved");
       console.log("Logging off from Discord");
-      this.destroy();
+      await this.destroy();
       console.log("Logged off");
       console.log("Closing MongoDB Connection");
-      mongoose.connection.close(false, (err) => {
-        if (err) {
-          console.error(err);
-          process.exit(1);
-        }
+      try {
+        await mongoose.connection.close();
         console.log("MongoDB Connection Closed");
         process.exit(0);
-      });
+      } catch (err) {
+        console.error(err);
+        process.exit(1);
+      }
     });
   }
 }

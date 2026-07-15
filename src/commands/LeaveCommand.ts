@@ -1,5 +1,8 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, CacheType } from "discord.js";
+import {
+  CacheType,
+  ChatInputCommandInteraction,
+  SlashCommandBuilder,
+} from "discord.js";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 
@@ -8,7 +11,7 @@ class LeaveCommand extends CommandAbs {
     .setName("leave")
     .setDescription("Leave the voice channel.");
   public async execute(
-    interaction: CommandInteraction<CacheType>
+    interaction: ChatInputCommandInteraction<CacheType>
   ): Promise<void> {
     //get client and make do type check to get subscriptions
     const { client } = interaction;

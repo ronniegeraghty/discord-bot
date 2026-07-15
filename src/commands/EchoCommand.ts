@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from "discord.js";
 import { CommandType } from "../client/Command";
 
 // class EchoCommand extends CommandAbs {

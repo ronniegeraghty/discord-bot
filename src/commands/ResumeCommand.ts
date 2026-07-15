@@ -1,6 +1,10 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { AudioPlayerStatus } from "@discordjs/voice";
-import { CommandInteraction, CacheType, ButtonInteraction } from "discord.js";
+import {
+  ButtonInteraction,
+  CacheType,
+  ChatInputCommandInteraction,
+  SlashCommandBuilder,
+} from "discord.js";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 
@@ -9,11 +13,13 @@ export class ResumeCommand extends CommandAbs {
     .setName("resume")
     .setDescription("Resume playing the current song.");
   public async execute(
-    interaction: CommandInteraction<CacheType>
+    interaction: ChatInputCommandInteraction<CacheType>
   ): Promise<void> {
     this.resume(interaction);
   }
-  public async resume(interaction: CommandInteraction | ButtonInteraction) {
+  public async resume(
+    interaction: ChatInputCommandInteraction | ButtonInteraction
+  ) {
     //get client and make do type check to get subscriptions
     const { client } = interaction;
     if (client instanceof BotClient) {

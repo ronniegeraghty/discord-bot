@@ -1,7 +1,11 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { AudioPlayerStatus, AudioResource } from "@discordjs/voice";
-import { ColorResolvable, CommandInteraction, MessageEmbed } from "discord.js";
-import ytdl from "ytdl-core";
+import {
+  ChatInputCommandInteraction,
+  ColorResolvable,
+  EmbedBuilder,
+  SlashCommandBuilder,
+} from "discord.js";
+import ytdl from "@distube/ytdl-core";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 import Track from "../client/Track";
@@ -10,7 +14,7 @@ class QueueCommand extends CommandAbs {
   public data = new SlashCommandBuilder()
     .setName("queue")
     .setDescription("See all songs on the queue");
-  public async execute(interaction: CommandInteraction) {
+  public async execute(interaction: ChatInputCommandInteraction) {
     //check if guild has a music subscription with a queue
     const { client, guildId } = interaction;
     if (client instanceof BotClient) {
@@ -61,7 +65,7 @@ class QueueCommand extends CommandAbs {
   private async getSongEmbed(
     track: Track,
     titlePrefix = ""
-  ): Promise<MessageEmbed> {
+  ): Promise<EmbedBuilder> {
     // Deside color for embed
     let color: ColorResolvable;
     switch (track.urlType) {
@@ -75,7 +79,7 @@ class QueueCommand extends CommandAbs {
         color = "#FFFFFF";
         break;
     }
-    return new MessageEmbed()
+    return new EmbedBuilder()
       .setTitle(`${titlePrefix}**${track.title}**`)
       .setColor(color)
       .setDescription(`Added By: ${track.userTag}`)

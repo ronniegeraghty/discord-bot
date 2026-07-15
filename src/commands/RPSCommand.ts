@@ -1,11 +1,10 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import {
-  Interaction,
-  MessageActionRow,
-  MessageButton,
-  InteractionCollector,
-  CommandInteraction,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ChatInputCommandInteraction,
   MessageComponentInteraction,
+  SlashCommandBuilder,
 } from "discord.js";
 import { CommandAbs } from "../client/Command";
 
@@ -27,13 +26,15 @@ class RPSCommand extends CommandAbs {
       beats: "paper",
     },
   };
-  public async execute(interaction: CommandInteraction): Promise<void> {
-    const buttons = new MessageActionRow().addComponents(
+  public async execute(
+    interaction: ChatInputCommandInteraction
+  ): Promise<void> {
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       Object.keys(this.HANDS).map((key) =>
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId(key)
           .setLabel(this.HANDS[key].emoji)
-          .setStyle("PRIMARY")
+          .setStyle(ButtonStyle.Primary)
       )
     );
     await interaction.reply({
@@ -43,11 +44,10 @@ class RPSCommand extends CommandAbs {
     const filter = (i: MessageComponentInteraction) =>
       i.customId in this.HANDS && i.user.id === interaction.user.id;
 
-    const collector: InteractionCollector<Interaction> =
-      interaction.channel.createMessageComponentCollector({
-        filter,
-        time: 15000,
-      });
+    const collector = interaction.channel.createMessageComponentCollector({
+      filter,
+      time: 15000,
+    });
     collector.on("collect", async (i) => {
       if (i.isButton()) {
         const arrOfHANDS = Object.keys(this.HANDS);

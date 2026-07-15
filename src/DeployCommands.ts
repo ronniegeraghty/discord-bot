@@ -1,7 +1,6 @@
 import fs from "fs";
 import { join } from "path";
-import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v9";
+import { REST, Routes } from "discord.js";
 import Command, {
   CommandAbs,
   CommandType,
@@ -10,7 +9,7 @@ import Command, {
 import SubscribedGuild, {
   SubscribedGuildInterface,
 } from "./database/schemas/SubscribedGuilds";
-import mongoose, { Error } from "mongoose";
+import mongoose from "mongoose";
 import * as dotenv from "dotenv";
 import { DatabaseOptions } from "./database/DatabaseOptions.type";
 dotenv.config();
@@ -35,34 +34,40 @@ const rawCommandOptions: RawCommandOptions = {
 switch (process.argv.slice(2)[0]) {
   case "-deploy": {
     console.log(`Deploying Slash Commands from CLI!`);
-    mongoose.connect(
-      `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`,
-      {},
-      (err: Error) => {
-        if (err) throw err;
+    mongoose
+      .connect(
+        `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`
+      )
+      .then(() => {
         console.log(`Connected to MongoDB`);
-      }
-    );
-    refreshCommandsForAll().then((value) => {
-      console.log(`Disconnecting from DB.`);
-      mongoose.disconnect();
-    });
+        return refreshCommandsForAll();
+      })
+      .then(() => {
+        console.log(`Disconnecting from DB.`);
+        return mongoose.disconnect();
+      })
+      .catch((err) => {
+        throw err;
+      });
     break;
   }
   case "-wipe": {
     console.log(`Wiping Slash Commands from CLI!`);
-    mongoose.connect(
-      `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`,
-      {},
-      (err: Error) => {
-        if (err) throw err;
+    mongoose
+      .connect(
+        `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`
+      )
+      .then(() => {
         console.log(`Connected to MongoDB`);
-      }
-    );
-    unsubscribeAllFromCommands().then((value) => {
-      console.log(`Disconnecting from DB.`);
-      mongoose.disconnect();
-    });
+        return unsubscribeAllFromCommands();
+      })
+      .then(() => {
+        console.log(`Disconnecting from DB.`);
+        return mongoose.disconnect();
+      })
+      .catch((err) => {
+        throw err;
+      });
     break;
   }
   default: {
@@ -70,22 +75,13 @@ switch (process.argv.slice(2)[0]) {
   }
 }
 
-export function refreshCommandsForAll(): Promise<void> {
-  return new Promise((resolve) => {
-    SubscribedGuild.find(
-      {},
-      (err: Error, guilds: SubscribedGuildInterface[]) => {
-        if (err)
-          throw new Error(
-            `Error retrieving all Subsribed Guilds from DB - Error: ${err}`
-          );
-        if (!guilds) {
-          console.log(`Guilds List empty`);
-        }
-        if (guilds) publishSlashCommands(guilds).then(() => resolve());
-      }
-    );
-  });
+export async function refreshCommandsForAll(): Promise<void> {
+  const guilds = await SubscribedGuild.find({});
+  if (!guilds || guilds.length === 0) {
+    console.log(`Guilds List empty`);
+    return;
+  }
+  await publishSlashCommands(guilds);
 }
 export function refreshCommandsForGuild(
   guild: SubscribedGuildInterface
@@ -117,7 +113,7 @@ function publishSlashCommands(
     }
     Promise.all(commands).then((resolvedCommands) => {
       console.log(`Commands to be uploaded: `, resolvedCommands);
-      const rest = new REST({ version: "9" }).setToken(token);
+      const rest = new REST({ version: "10" }).setToken(token);
       guilds.forEach((guild: SubscribedGuildInterface) => {
         console.log(` - Refreshing commands for Server: ${guild.guildId}`);
         rest
@@ -135,22 +131,13 @@ function publishSlashCommands(
     });
   });
 }
-export function unsubscribeAllFromCommands(): Promise<void> {
-  return new Promise((resolve) => {
-    SubscribedGuild.find(
-      {},
-      (err: Error, guilds: SubscribedGuildInterface[]) => {
-        if (err)
-          throw new Error(
-            `Error retrieving all Subsribed Guilds from DB - Error: ${err}`
-          );
-        if (!guilds) {
-          console.log(`Guilds List empty`);
-        }
-        if (guilds) unsubscribeFromCommands(guilds).then(() => resolve());
-      }
-    );
-  });
+export async function unsubscribeAllFromCommands(): Promise<void> {
+  const guilds = await SubscribedGuild.find({});
+  if (!guilds || guilds.length === 0) {
+    console.log(`Guilds List empty`);
+    return;
+  }
+  await unsubscribeFromCommands(guilds);
 }
 export function unsubscribeGuildFromCommands(
   guild: SubscribedGuildInterface
@@ -167,7 +154,7 @@ export function unsubscribeFromCommands(
   return new Promise((resolve) => {
     //empty commands array
     const commands = [];
-    const rest = new REST({ version: "9" }).setToken(token);
+    const rest = new REST({ version: "10" }).setToken(token);
     guilds.forEach((guild: SubscribedGuildInterface) => {
       console.log(` - Wiping commands for Server: ${guild.guildId}`);
       rest
