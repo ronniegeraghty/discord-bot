@@ -1,34 +1,16 @@
 import fs from "fs";
 import { join } from "path";
 import { REST, Routes } from "discord.js";
-import Command, {
-  CommandAbs,
-  CommandType,
-  RawCommandOptions,
-} from "./client/Command";
+import Command, { CommandAbs, CommandType } from "./client/Command";
 import SubscribedGuild, {
   SubscribedGuildInterface,
 } from "./database/schemas/SubscribedGuilds";
 import mongoose from "mongoose";
-import * as dotenv from "dotenv";
-import { DatabaseOptions } from "./database/DatabaseOptions";
-dotenv.config();
+import { config } from "./config";
 
-const token = process.env.DISCORD_TOKEN;
-const clientId = process.env.CLIENT_ID;
-const dbConfig: DatabaseOptions = {
-  username: process.env.MONGO_ROOT_USER,
-  password: process.env.MONGO_ROOT_PASSWORD,
-  url:
-    process.env.ENV === "CONTAINER" ? process.env.MONGO_HOST_NAME : "localhost",
-  port: process.env.MONGO_INTERNAL_PORT,
-  dbName: process.env.MONGO_DATABASE,
-  dbOptions: process.env.MONGO_OPTIONS,
-};
-
-const rawCommandOptions: RawCommandOptions = {
-  prefix: process.env.PREFIX,
-};
+const token = config.discordToken;
+const clientId = config.clientId;
+const dbConfig = config.databaseOptions;
 
 //Process cli args
 switch (process.argv.slice(2)[0]) {

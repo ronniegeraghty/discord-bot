@@ -21,7 +21,8 @@
     "libsodium-wrappers": "^0.8.4",
     "mongoose": "^9.7.4",
     "opusscript": "^0.1.1",
-    "youtube-dl-exec": "^3.1.9"
+    "youtube-dl-exec": "^3.1.9",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
