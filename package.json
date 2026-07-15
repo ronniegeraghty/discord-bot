@@ -1,37 +1,29 @@
 {
-  "name": "discord-bot",
+  "name": "ronbot",
   "version": "2.1.0",
-  "description": "A self-hosted Discord music bot that plays YouTube audio in voice channels.",
-  "main": "./build/Bot.js",
+  "private": true,
+  "packageManager": "npm@11.10.0",
+  "description": "Ron-bot monorepo: a self-hosted Discord music bot plus a companion audio-streaming client.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "start": "node ./build/Bot.js",
-    "build": "tsc --build",
-    "dev": "nodemon --watch src --ext ts --exec \"ts-node src/Bot.ts\"",
-    "deploy-commands": "node ./build/DeployCommands.js -deploy",
-    "wipe-commands": "node ./build/DeployCommands.js -wipe",
-    "deps-report": "node ./ci/discord-voice-gen-deps.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "start:bot": "npm run start --workspace @ronbot/bot",
+    "deploy-commands": "npm run deploy-commands --workspace @ronbot/bot",
+    "wipe-commands": "npm run wipe-commands --workspace @ronbot/bot"
   },
   "author": "Ronnie Geraghty",
   "license": "ISC",
   "engines": {
     "node": ">=18"
   },
-  "dependencies": {
-    "@discordjs/voice": "^0.19.2",
-    "discord.js": "^14.26.5",
-    "dotenv": "^17.4.2",
-    "ffmpeg-static": "^5.3.0",
-    "libsodium-wrappers": "^0.8.4",
-    "mongoose": "^9.7.4",
-    "opusscript": "^0.1.1",
-    "youtube-dl-exec": "^3.1.9"
-  },
   "devDependencies": {
-    "@types/node": "^24.0.0",
-    "nodemon": "^3.1.14",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "turbo": "^2.5.0"
   },
   "overrides": {
     "discord.js": {

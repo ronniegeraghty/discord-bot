@@ -1,0 +1,14 @@
+{
+  "name": "@ronbot/protocol",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared types and wire protocol for the ron-bot audio streaming feature.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

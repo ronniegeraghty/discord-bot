@@ -1,23 +1,29 @@
 # BUILD CONTAINER
 FROM node:24-alpine AS ts-compiler
-WORKDIR /development/
+WORKDIR /repo
 ENV YOUTUBE_DL_SKIP_PYTHON_CHECK=1
-COPY package*.json ./
+# Copy workspace manifests first for better layer caching
+COPY package.json package-lock.json turbo.json ./
+COPY apps/bot/package.json ./apps/bot/
+COPY packages/protocol/package.json ./packages/protocol/
 RUN npm ci
+# Copy sources and build all workspaces via turbo
 COPY . .
-# Run TypeScript build
 RUN npm run build
 
 # RUNTIME CONTAINER
 FROM node:24-alpine AS prod
-WORKDIR /app/
+WORKDIR /repo
 ENV YOUTUBE_DL_SKIP_PYTHON_CHECK=1
 # ffmpeg for audio transcoding; python3 to run the yt-dlp binary
 RUN apk add --no-cache ffmpeg python3
-COPY package*.json ./
+COPY package.json package-lock.json ./
+COPY apps/bot/package.json ./apps/bot/
+COPY packages/protocol/package.json ./packages/protocol/
 RUN npm ci --omit=dev
 USER node
-COPY --from=ts-compiler --chown=node /development/build/ ./build/
+COPY --from=ts-compiler --chown=node /repo/apps/bot/build/ ./apps/bot/build/
+WORKDIR /repo/apps/bot
 # Start
 ENTRYPOINT ["npm", "start"]
 
