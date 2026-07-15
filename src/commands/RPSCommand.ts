@@ -60,16 +60,13 @@ class RPSCommand extends CommandAbs {
         let result = "empty";
         if (winner) {
           if (winner === "DRAW") {
-            result = winner;
+            result = "It's a draw!";
           } else {
-            result = `${i.client.users.cache.get(winner)} Wins!`;
+            const winnerUser = winner === i.user.id ? i.user : i.client.user;
+            result = `${winnerUser.tag} Wins!`;
           }
           console.log(
-            ` - User chose: ${
-              i.customId
-            } - Bot chose: ${randomHand} - Winner: ${
-              i.client.users.cache.get(winner).tag
-            }`
+            ` - User chose: ${i.customId} - Bot chose: ${randomHand} - ${result}`,
           );
         }
         i.update({

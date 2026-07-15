@@ -54,7 +54,7 @@ export default class Track implements TrackData {
   }
 
   public createAudioResource(): Promise<AudioResource<Track>> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let stream: Readable;
       switch (this.urlType) {
         case "youtube":
@@ -65,17 +65,24 @@ export default class Track implements TrackData {
           });
           break;
         default:
-          reject();
+          reject(new Error(`Unsupported url type: ${this.urlType}`));
+          return;
       }
 
-      demuxProbe(stream).then((probe: { stream: any; type: any }) =>
-        resolve(
-          createAudioResource(probe.stream, {
-            metadata: this,
-            inputType: probe.type,
-          })
+      // Surface stream errors (e.g. failed extraction) as a rejection instead
+      // of letting them bubble up as an uncaught exception that crashes the bot.
+      stream.on("error", (error) => reject(error));
+
+      demuxProbe(stream)
+        .then((probe: { stream: any; type: any }) =>
+          resolve(
+            createAudioResource(probe.stream, {
+              metadata: this,
+              inputType: probe.type,
+            }),
+          ),
         )
-      );
+        .catch((error) => reject(error));
     });
   }
 

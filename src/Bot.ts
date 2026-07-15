@@ -5,6 +5,15 @@ import { DatabaseOptions } from "./database/DatabaseOptions";
 import { RawCommandOptions } from "./client/Command";
 dotenv.config();
 
+// Global safety nets: a single command or stream error should never crash the
+// entire bot process. Log and keep running instead.
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled promise rejection:", reason);
+});
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
+});
+
 const token = process.env.DISCORD_TOKEN;
 const dbConfig: DatabaseOptions = {
   username: process.env.MONGO_ROOT_USER,
