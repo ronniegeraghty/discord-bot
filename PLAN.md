@@ -52,12 +52,12 @@ Living checklist for the modernization, hardening, and feature work. Check items
 - [x] Graceful shutdown (SIGTERM/SIGINT, re-entry guard, force-exit timeout) _(health/readiness endpoint moved to Phase 4 with the stream server)_
 
 ## Phase 3 — Tests without Discord (Vitest)
-- [ ] Vitest setup + `npm test`
-- [ ] Unit tests: URL parsing (`getURLType`), `RPS.calcWinner`, queue logic
-- [ ] Command tests with mocked interactions (assert replies)
-- [ ] `AudioSource` contract tests (mock extractor → error paths)
-- [ ] ESLint (flat config) + prettier
-- [ ] CI: typecheck + lint + test job (on PR)
+- [x] Vitest setup + `npm test`
+- [x] Unit tests: URL parsing (`getURLType`/`findUrlEndPoint`), `RPS.calcWinner` _(queue logic deferred — tightly coupled to @discordjs/voice)_
+- [x] Command tests with mocked interactions (assert replies) — `ping`, `echo`
+- [ ] `AudioSource` contract tests (mock extractor → error paths) — _with the AudioSource abstraction_
+- [x] ESLint (flat config) + prettier
+- [x] CI: typecheck + lint + test job (on PR)
 
 ## Phase 4 — Feature: stream local PC audio → ronbot → voice channel
 - [ ] `packages/protocol`: auth handshake + Opus frame message format
