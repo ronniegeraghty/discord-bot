@@ -8,33 +8,20 @@ import {
 } from "discord.js";
 import { CommandAbs } from "../client/Command";
 import { logger } from "../logger";
+import { HANDS, calcWinner } from "../game/rps";
 
 class RPSCommand extends CommandAbs {
   public data = new SlashCommandBuilder()
     .setName("rps")
     .setDescription("Play Rock Paper Scissors.");
-  private HANDS = {
-    rock: {
-      emoji: "✊",
-      beats: "scissor",
-    },
-    paper: {
-      emoji: "✋",
-      beats: "rock",
-    },
-    scissor: {
-      emoji: "✌",
-      beats: "paper",
-    },
-  };
   public async execute(
     interaction: ChatInputCommandInteraction
   ): Promise<void> {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      Object.keys(this.HANDS).map((key) =>
+      Object.keys(HANDS).map((key) =>
         new ButtonBuilder()
           .setCustomId(key)
-          .setLabel(this.HANDS[key].emoji)
+          .setLabel(HANDS[key].emoji)
           .setStyle(ButtonStyle.Primary)
       )
     );
@@ -43,7 +30,7 @@ class RPSCommand extends CommandAbs {
       components: [buttons],
     });
     const filter = (i: MessageComponentInteraction) =>
-      i.customId in this.HANDS && i.user.id === interaction.user.id;
+      i.customId in HANDS && i.user.id === interaction.user.id;
 
     const collector = interaction.channel.createMessageComponentCollector({
       filter,
@@ -51,10 +38,10 @@ class RPSCommand extends CommandAbs {
     });
     collector.on("collect", async (i) => {
       if (i.isButton()) {
-        const arrOfHANDS = Object.keys(this.HANDS);
+        const arrOfHANDS = Object.keys(HANDS);
         const randomHand =
           arrOfHANDS[Math.floor(Math.random() * arrOfHANDS.length)];
-        const winner = this.calcWinner([
+        const winner = calcWinner([
           { userid: i.user.id, handId: i.customId },
           { userid: i.client.user.id, handId: randomHand },
         ]);
@@ -71,23 +58,14 @@ class RPSCommand extends CommandAbs {
           );
         }
         i.update({
-          content: `${i.user.tag}: ${this.HANDS[i.customId].emoji} VS ${
+          content: `${i.user.tag}: ${HANDS[i.customId].emoji} VS ${
             i.client.user.tag
-          }: ${this.HANDS[randomHand].emoji}\n${result}`,
+          }: ${HANDS[randomHand].emoji}\n${result}`,
           components: [],
         });
         collector.stop("Finished");
       }
     });
-  }
-  private calcWinner(
-    game: { userid: string; handId: string }[]
-  ): string | void {
-    if (game.length !== 2) return;
-    else if (game[0].handId === game[1].handId) return "DRAW";
-    else if (this.HANDS[game[0].handId].beats === game[1].handId)
-      return game[0].userid;
-    else return game[1].userid;
   }
 }
 export default new RPSCommand();

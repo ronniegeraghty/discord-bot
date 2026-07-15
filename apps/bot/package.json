@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./build/Bot.js",
     "build": "tsc --build",
+    "test": "vitest run",
     "dev": "nodemon --watch src --ext ts --exec \"ts-node src/Bot.ts\"",
     "deploy-commands": "node ./build/DeployCommands.js -deploy",
     "wipe-commands": "node ./build/DeployCommands.js -wipe",
@@ -30,7 +31,8 @@
     "nodemon": "^3.1.14",
     "pino-pretty": "^13.0.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^4.1.10"
   },
   "optionalDependencies": {
     "@snazzah/davey-linux-x64-gnu": "0.1.12",
