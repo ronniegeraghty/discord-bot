@@ -22,6 +22,7 @@ export default class BotClient extends Client {
   public rawCommandOptions: RawCommandOptions;
   public subscriptions: Collection<string, MusicSubscription>;
   public collectors: Collection<string, InteractionCollector<any>>;
+  private shuttingDown = false;
   public constructor(
     token: string,
     dbOptions: DatabaseOptions,
@@ -170,21 +171,33 @@ export default class BotClient extends Client {
       throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
     }
   }
-  killBot() {
-    process.on("SIGTERM", async () => {
-      console.info("SIGTERM signal received");
-      console.log("Logging off from Discord");
-      await this.destroy();
-      console.log("Logged off");
-      console.log("Closing MongoDB Connection");
+  private killBot() {
+    const shutdown = async (signal: string) => {
+      // Ignore repeat signals so shutdown only runs once.
+      if (this.shuttingDown) return;
+      this.shuttingDown = true;
+      console.info(`${signal} received - shutting down gracefully`);
+      // Never let a stuck shutdown hang the process forever.
+      const forceExit = setTimeout(() => {
+        console.error("Graceful shutdown timed out - forcing exit");
+        process.exit(1);
+      }, 10000);
+      forceExit.unref();
       try {
+        console.log("Logging off from Discord");
+        await this.destroy();
+        console.log("Closing MongoDB connection");
         await mongoose.connection.close();
-        console.log("MongoDB Connection Closed");
+        console.log("Shutdown complete");
+        clearTimeout(forceExit);
         process.exit(0);
       } catch (err) {
-        console.error(err);
+        console.error("Error during shutdown:", err);
+        clearTimeout(forceExit);
         process.exit(1);
       }
-    });
+    };
+    process.once("SIGTERM", () => shutdown("SIGTERM"));
+    process.once("SIGINT", () => shutdown("SIGINT"));
   }
 }
