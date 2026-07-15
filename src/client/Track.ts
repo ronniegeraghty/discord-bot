@@ -3,8 +3,7 @@ import {
   createAudioResource,
   demuxProbe,
 } from "@discordjs/voice";
-import ytdl, { getBasicInfo as getYoutubeInfo } from "@distube/ytdl-core";
-import { Readable } from "stream";
+import youtubedl from "youtube-dl-exec";
 
 /**
  * This is the data required to create a Track Object
@@ -13,6 +12,7 @@ export interface TrackData {
   url: string;
   urlType: ULRTYPES;
   title: string;
+  thumbnail: string | null;
   userTag: string;
   onStart: () => void;
   onFinish: () => void;
@@ -30,6 +30,7 @@ export default class Track implements TrackData {
   public readonly url: string;
   public readonly urlType: ULRTYPES;
   public readonly title: string;
+  public readonly thumbnail: string | null;
   public readonly userTag: string;
   public readonly onStart: () => void;
   public readonly onFinish: () => void;
@@ -39,6 +40,7 @@ export default class Track implements TrackData {
     url,
     urlType,
     title,
+    thumbnail,
     userTag,
     onStart,
     onFinish,
@@ -47,6 +49,7 @@ export default class Track implements TrackData {
     this.url = url;
     this.urlType = urlType;
     this.title = title;
+    this.thumbnail = thumbnail;
     this.userTag = userTag;
     this.onStart = onStart;
     this.onFinish = onFinish;
@@ -55,26 +58,34 @@ export default class Track implements TrackData {
 
   public createAudioResource(): Promise<AudioResource<Track>> {
     return new Promise((resolve, reject) => {
-      let stream: Readable;
-      switch (this.urlType) {
-        case "youtube":
-          stream = ytdl(this.url, {
-            filter: "audioonly",
-            quality: "highestaudio",
-            highWaterMark: 1 << 25,
-          });
-          break;
-        default:
-          reject(new Error(`Unsupported url type: ${this.urlType}`));
-          return;
+      // Stream the best audio track from yt-dlp straight to stdout; demuxProbe
+      // detects the container/codec so it can play without re-encoding.
+      const subprocess = youtubedl.exec(
+        this.url,
+        {
+          output: "-",
+          format: "bestaudio[acodec=opus]/bestaudio/best",
+          quiet: true,
+          noWarnings: true,
+          noPlaylist: true,
+          noCheckCertificates: true,
+        },
+        { stdio: ["ignore", "pipe", "ignore"] },
+      );
+
+      const stream = subprocess.stdout;
+      if (!stream) {
+        reject(new Error("Failed to start audio stream."));
+        return;
       }
 
-      // Surface stream errors (e.g. failed extraction) as a rejection instead
-      // of letting them bubble up as an uncaught exception that crashes the bot.
-      stream.on("error", (error) => reject(error));
+      // Surface spawn/stream errors as a rejection instead of letting them
+      // bubble up as an uncaught exception that crashes the bot.
+      subprocess.once("error", (error) => reject(error));
+      stream.once("error", (error) => reject(error));
 
       demuxProbe(stream)
-        .then((probe: { stream: any; type: any }) =>
+        .then((probe) =>
           resolve(
             createAudioResource(probe.stream, {
               metadata: this,
@@ -86,42 +97,52 @@ export default class Track implements TrackData {
     });
   }
 
-  public static from(
+  public static async from(
     url: string,
     userTag: string,
-    methods: Pick<Track, "onStart" | "onFinish" | "onError">
+    methods: Pick<Track, "onStart" | "onFinish" | "onError">,
   ): Promise<Track> {
-    return new Promise(async (resolve, reject) => {
-      const urlType = this.getURLType(url);
-      const title = await this.getTitle(url, urlType);
-      if (!title) reject("Invalid URL Type");
-      //The methods are wrapped so that we can ensure that they are only called once.
-      const wrapperMethods = {
-        onStart() {
-          wrapperMethods.onStart = noop;
-          methods.onStart();
-        },
-        onFinish() {
-          wrapperMethods.onFinish = noop;
-          methods.onFinish();
-        },
-        onError(error: Error) {
-          wrapperMethods.onError = noop;
-          methods.onError(error);
-        },
-      };
-      resolve(
-        new Track({
-          title: title,
-          urlType,
-          url,
-          userTag,
-          ...wrapperMethods,
-        })
+    const urlType = this.getURLType(url);
+    if (!urlType) {
+      throw new Error(
+        "Invalid or unsupported URL. Provide a YouTube or SoundCloud link.",
       );
+    }
+
+    // Fetch metadata (title + thumbnail) once, up front, via yt-dlp.
+    const info = (await youtubedl(url, {
+      dumpSingleJson: true,
+      noWarnings: true,
+      noPlaylist: true,
+      noCheckCertificates: true,
+    })) as { title?: string; thumbnail?: string };
+
+    // The methods are wrapped so that we can ensure they are only called once.
+    const wrapperMethods = {
+      onStart() {
+        wrapperMethods.onStart = noop;
+        methods.onStart();
+      },
+      onFinish() {
+        wrapperMethods.onFinish = noop;
+        methods.onFinish();
+      },
+      onError(error: Error) {
+        wrapperMethods.onError = noop;
+        methods.onError(error);
+      },
+    };
+
+    return new Track({
+      url,
+      urlType,
+      title: info.title ?? "Unknown title",
+      thumbnail: info.thumbnail ?? null,
+      userTag,
+      ...wrapperMethods,
     });
   }
-  public static getURLType(url: string): ULRTYPES {
+  public static getURLType(url: string): ULRTYPES | null {
     let endIndex: number = this.findUrlEndPoint(url);
     switch (url.substring(0, endIndex)) {
       case "https://www.youtube":
@@ -143,13 +164,5 @@ export default class Track implements TrackData {
       }
     }
     return 0;
-  }
-  public static async getTitle(url, urlType): Promise<string> {
-    switch (urlType) {
-      case "youtube":
-        return (await getYoutubeInfo(url)).videoDetails.title;
-      default:
-        return "";
-    }
   }
 }

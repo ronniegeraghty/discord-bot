@@ -5,7 +5,6 @@ import {
   EmbedBuilder,
   SlashCommandBuilder,
 } from "discord.js";
-import ytdl from "@distube/ytdl-core";
 import BotClient from "../client/BotClient";
 import { CommandAbs } from "../client/Command";
 import Track from "../client/Track";
@@ -83,9 +82,7 @@ class QueueCommand extends CommandAbs {
       .setTitle(`${titlePrefix}**${track.title}**`)
       .setColor(color)
       .setDescription(`Added By: ${track.userTag}`)
-      .setThumbnail(
-        (await ytdl.getBasicInfo(track.url)).videoDetails.thumbnails[0].url
-      );
+      .setThumbnail(track.thumbnail);
   }
 }
 export default new QueueCommand();

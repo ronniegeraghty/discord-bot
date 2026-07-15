@@ -34,14 +34,14 @@ Living checklist for the modernization, hardening, and feature work. Check items
 - [x] Fix RPS crash (resolve winner from `i.user`/`i.client.user`, no cache)
 - [x] `Track.createAudioResource` rejects gracefully (`stream.on('error')` + `demuxProbe().catch()`)
 - [x] Global `unhandledRejection` / `uncaughtException` handlers
-- [ ] Rebuild container & re-verify (RPS works, `/play` fails politely)
+- [x] Rebuild container & re-verify (RPS works)
 
 ## Phase 1 — Fix YouTube playback
-- [ ] Add `youtube-dl-exec` (yt-dlp); remove `@distube/ytdl-core`
-- [ ] Introduce `AudioSource` abstraction (pluggable engine)
-- [ ] Wire yt-dlp streaming into `Track` / `Subscription`
-- [ ] Container: install `python3` + yt-dlp; make working dir writable
-- [ ] Re-test playback end-to-end
+- [x] Add `youtube-dl-exec` (yt-dlp); remove `@distube/ytdl-core`
+- [ ] Introduce `AudioSource` abstraction (pluggable engine) — _deferred to Phase 2 refactor_
+- [x] Wire yt-dlp streaming into `Track` / `Subscription`
+- [x] Container: install `python3` + yt-dlp (streams to stdout, no writable cwd needed)
+- [ ] Re-test playback end-to-end in Discord _(extraction validated in-container; awaiting live `/play`)_
 
 ## Phase 2 — Hardening & reorganization (Turborepo)
 - [ ] Convert to Turborepo monorepo: `apps/bot`, `apps/stream-client`, `packages/protocol` (shared types), `packages/*`
