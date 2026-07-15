@@ -13,8 +13,33 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  # Typecheck, build, and run the test suite on every PR and push.
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      YOUTUBE_DL_SKIP_PYTHON_CHECK: "1"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck & build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
   # This workflow contains a single job called "build"
   docker-build-publish:
+    needs: verify
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     env:
