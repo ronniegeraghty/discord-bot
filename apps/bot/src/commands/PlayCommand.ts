@@ -35,7 +35,7 @@ const PlayCommand: CommandType = {
     ),
   async execute(interaction) {
     //Get URL Option
-    let url: string = interaction.options.getString("url");
+    const url: string = interaction.options.getString("url");
     //Extract properties of interaction to consts
     const { member, client, guildId } = interaction;
     //Type check on member and client

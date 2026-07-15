@@ -30,7 +30,7 @@ class QueueCommand extends CommandAbs {
         return;
       }
       // list of embed messages with songs in the queue
-      let queueMsgEmbeds = [];
+      const queueMsgEmbeds = [];
       // add the current song to the top of the queue
       switch (subscription.audioPlayer.state.status) {
         case AudioPlayerStatus.Playing:
@@ -53,7 +53,7 @@ class QueueCommand extends CommandAbs {
           break;
       }
       //gets songs on the subscription queue
-      for (let track of subscription.queue) {
+      for (const track of subscription.queue) {
         queueMsgEmbeds.push(await this.getSongEmbed(track));
       }
       interaction.reply({

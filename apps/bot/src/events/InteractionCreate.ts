@@ -2,7 +2,7 @@ import { Interaction } from "discord.js";
 
 module.exports = {
   name: "interactionCreate",
-  execute(interaction: Interaction) {
+  execute(_interaction: Interaction) {
     // console.log(
     //   `${interaction.user.tag} in #${interaction.guild.channels.cache.get(
     //     interaction.channelId

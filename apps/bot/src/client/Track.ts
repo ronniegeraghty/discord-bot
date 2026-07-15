@@ -19,7 +19,7 @@ export interface TrackData {
   onError: (error: Error) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
+ 
 const noop = () => {
   //comment to avoid sonarlint rule
 };
@@ -143,7 +143,7 @@ export default class Track implements TrackData {
     });
   }
   public static getURLType(url: string): ULRTYPES | null {
-    let endIndex: number = this.findUrlEndPoint(url);
+    const endIndex: number = this.findUrlEndPoint(url);
     switch (url.substring(0, endIndex)) {
       case "https://www.youtube":
         return "youtube";
@@ -157,7 +157,7 @@ export default class Track implements TrackData {
   }
   public static findUrlEndPoint(url: string): number {
     const endPointList = [".com", ".be"];
-    for (let endPoint of endPointList) {
+    for (const endPoint of endPointList) {
       const endPointIndex = url.toString().indexOf(endPoint);
       if (endPointIndex !== -1) {
         return endPointIndex;

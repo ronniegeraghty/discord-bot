@@ -1,4 +1,3 @@
-import { Interaction } from "discord.js";
 import Command from "../client/Command";
 
 class ServerCommand extends Command {

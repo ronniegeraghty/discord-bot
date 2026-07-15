@@ -70,7 +70,7 @@ export function refreshCommandsForGuild(
   guild: SubscribedGuildInterface
 ): Promise<void> {
   return new Promise((resolve) => {
-    let guilds: SubscribedGuildInterface[] = [];
+    const guilds: SubscribedGuildInterface[] = [];
     guilds.push(guild);
     publishSlashCommands(guilds).then(() => resolve());
   });
@@ -128,7 +128,7 @@ export function unsubscribeGuildFromCommands(
   guild: SubscribedGuildInterface
 ): Promise<void> {
   return new Promise((resolve) => {
-    let guilds: SubscribedGuildInterface[] = [];
+    const guilds: SubscribedGuildInterface[] = [];
     guilds.push(guild);
     unsubscribeFromCommands(guilds).then(() => resolve());
   });
