@@ -1,6 +1,7 @@
 import {
   CacheType,
   ChatInputCommandInteraction,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import BotClient from "../client/BotClient";
@@ -22,7 +23,7 @@ class LeaveCommand extends CommandAbs {
         await interaction.reply({
           content:
             "There is no music playing in this server. Use /play to start playing music.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }

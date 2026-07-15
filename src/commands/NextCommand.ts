@@ -2,6 +2,7 @@ import {
   ButtonInteraction,
   CacheType,
   ChatInputCommandInteraction,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import BotClient from "../client/BotClient";
@@ -28,7 +29,7 @@ export class NextCommand extends CommandAbs {
         await interaction.reply({
           content:
             "There is no music playing in this server. Use /play to start playing music.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }

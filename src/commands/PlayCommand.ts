@@ -6,6 +6,7 @@ import {
   ChatInputCommandInteraction,
   GuildMember,
   MessageComponentInteraction,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import { CommandType } from "../client/Command";
@@ -42,7 +43,7 @@ const PlayCommand: CommandType = {
       if (!member.voice.channel) {
         interaction.reply({
           content: "You must be in a voice channel to play music.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -116,7 +117,7 @@ async function createTrack(
         interaction
           .followUp({
             content: `Now playing ${track.title}!`,
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           })
           .catch(console.warn);
       },
@@ -126,7 +127,7 @@ async function createTrack(
       onError(error) {
         console.warn(error);
         interaction
-          .followUp({ content: `Error: ${error}`, ephemeral: true })
+          .followUp({ content: `Error: ${error}`, flags: MessageFlags.Ephemeral })
           .catch(console.warn);
       },
     });

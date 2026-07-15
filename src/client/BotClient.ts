@@ -6,6 +6,7 @@ import {
   Collection,
   InteractionCollector,
   Message,
+  MessageFlags,
 } from "discord.js";
 import { COMMANDS, RawCommand, RawCommandOptions } from "./Command";
 import mongoose from "mongoose";
@@ -82,7 +83,7 @@ export default class BotClient extends Client {
         );
         await interaction.reply({
           content: "There was an error while executing this command!",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
     });

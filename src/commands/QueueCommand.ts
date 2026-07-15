@@ -3,6 +3,7 @@ import {
   ChatInputCommandInteraction,
   ColorResolvable,
   EmbedBuilder,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import BotClient from "../client/BotClient";
@@ -24,7 +25,7 @@ class QueueCommand extends CommandAbs {
       ) {
         interaction.reply({
           content: "There is no music queued for this server.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }

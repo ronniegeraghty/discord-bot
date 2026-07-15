@@ -3,6 +3,7 @@ import {
   ButtonInteraction,
   CacheType,
   ChatInputCommandInteraction,
+  MessageFlags,
   SlashCommandBuilder,
 } from "discord.js";
 import BotClient from "../client/BotClient";
@@ -29,7 +30,7 @@ export class ResumeCommand extends CommandAbs {
         await interaction.followUp({
           content:
             "There is no music playing in this server. Use /play to start playing music.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       } else if (
@@ -37,7 +38,7 @@ export class ResumeCommand extends CommandAbs {
       ) {
         await interaction.followUp({
           content: "Music is already playing",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }

@@ -36,15 +36,15 @@ Living checklist for the modernization, hardening, and feature work. Check items
 - [x] Global `unhandledRejection` / `uncaughtException` handlers
 - [x] Rebuild container & re-verify (RPS works)
 
-## Phase 1 — Fix YouTube playback
+## Phase 1 — Fix YouTube playback ✅
 - [x] Add `youtube-dl-exec` (yt-dlp); remove `@distube/ytdl-core`
-- [ ] Introduce `AudioSource` abstraction (pluggable engine) — _deferred to Phase 2 refactor_
 - [x] Wire yt-dlp streaming into `Track` / `Subscription`
 - [x] Container: install `python3` + yt-dlp (streams to stdout, no writable cwd needed)
-- [ ] Re-test playback end-to-end in Discord _(extraction validated in-container; awaiting live `/play`)_
+- [x] Re-test playback end-to-end in Discord (play / pause / queue / skip / leave confirmed working)
 
 ## Phase 2 — Hardening & reorganization (Turborepo)
 - [ ] Convert to Turborepo monorepo: `apps/bot`, `apps/stream-client`, `packages/protocol` (shared types), `packages/*`
+- [ ] Introduce `AudioSource` abstraction (pluggable engine: YouTube / file / live stream) — _moved from Phase 1_
 - [ ] Centralized config validation (`zod`, fail-fast on missing env)
 - [ ] Structured logging (`pino`) replacing `console.log`
 - [ ] Command error wrapper (consistent catch + ephemeral reply)
