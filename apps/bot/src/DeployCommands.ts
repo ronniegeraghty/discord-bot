@@ -7,6 +7,7 @@ import SubscribedGuild, {
 } from "./database/schemas/SubscribedGuilds";
 import mongoose from "mongoose";
 import { config } from "./config";
+import { logger } from "./logger";
 
 const token = config.discordToken;
 const clientId = config.clientId;
@@ -15,17 +16,17 @@ const dbConfig = config.databaseOptions;
 //Process cli args
 switch (process.argv.slice(2)[0]) {
   case "-deploy": {
-    console.log(`Deploying Slash Commands from CLI!`);
+    logger.info("Deploying slash commands from CLI");
     mongoose
       .connect(
         `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`
       )
       .then(() => {
-        console.log(`Connected to MongoDB`);
+        logger.info("Connected to MongoDB");
         return refreshCommandsForAll();
       })
       .then(() => {
-        console.log(`Disconnecting from DB.`);
+        logger.info("Disconnecting from DB");
         return mongoose.disconnect();
       })
       .catch((err) => {
@@ -34,17 +35,17 @@ switch (process.argv.slice(2)[0]) {
     break;
   }
   case "-wipe": {
-    console.log(`Wiping Slash Commands from CLI!`);
+    logger.info("Wiping slash commands from CLI");
     mongoose
       .connect(
         `mongodb://${dbConfig.username}:${dbConfig.password}@${dbConfig.url}:${dbConfig.port}/${dbConfig.dbName}?${dbConfig.dbOptions}`
       )
       .then(() => {
-        console.log(`Connected to MongoDB`);
+        logger.info("Connected to MongoDB");
         return unsubscribeAllFromCommands();
       })
       .then(() => {
-        console.log(`Disconnecting from DB.`);
+        logger.info("Disconnecting from DB");
         return mongoose.disconnect();
       })
       .catch((err) => {
@@ -60,7 +61,7 @@ switch (process.argv.slice(2)[0]) {
 export async function refreshCommandsForAll(): Promise<void> {
   const guilds = await SubscribedGuild.find({});
   if (!guilds || guilds.length === 0) {
-    console.log(`Guilds List empty`);
+    logger.info("Guilds list empty");
     return;
   }
   await publishSlashCommands(guilds);
@@ -94,21 +95,23 @@ function publishSlashCommands(
       );
     }
     Promise.all(commands).then((resolvedCommands) => {
-      console.log(`Commands to be uploaded: `, resolvedCommands);
+      logger.info(`Uploading ${resolvedCommands.length} command(s)`);
       const rest = new REST({ version: "10" }).setToken(token);
       guilds.forEach((guild: SubscribedGuildInterface) => {
-        console.log(` - Refreshing commands for Server: ${guild.guildId}`);
+        logger.info(`Refreshing commands for guild ${guild.guildId}`);
         rest
           .put(Routes.applicationGuildCommands(clientId, guild.guildId), {
             body: resolvedCommands,
           })
           .then(() =>
-            console.log(
-              ` - Successfully registered application commands for ${guild.guildId}`
+            logger.info(
+              `Successfully registered application commands for ${guild.guildId}`
             )
           )
           .then(() => resolve())
-          .catch(console.error);
+          .catch((err) =>
+            logger.error({ err }, "Failed to register application commands")
+          );
       });
     });
   });
@@ -116,7 +119,7 @@ function publishSlashCommands(
 export async function unsubscribeAllFromCommands(): Promise<void> {
   const guilds = await SubscribedGuild.find({});
   if (!guilds || guilds.length === 0) {
-    console.log(`Guilds List empty`);
+    logger.info("Guilds list empty");
     return;
   }
   await unsubscribeFromCommands(guilds);
@@ -138,18 +141,20 @@ export function unsubscribeFromCommands(
     const commands = [];
     const rest = new REST({ version: "10" }).setToken(token);
     guilds.forEach((guild: SubscribedGuildInterface) => {
-      console.log(` - Wiping commands for Server: ${guild.guildId}`);
+      logger.info(`Wiping commands for guild ${guild.guildId}`);
       rest
         .put(Routes.applicationGuildCommands(clientId, guild.guildId), {
           body: commands,
         })
         .then(() =>
-          console.log(
-            ` - Successfully wiped application commands for ${guild.guildId}`
+          logger.info(
+            `Successfully wiped application commands for ${guild.guildId}`
           )
         )
         .then(() => resolve())
-        .catch(console.error);
+        .catch((err) =>
+          logger.error({ err }, "Failed to wipe application commands")
+        );
     });
   });
 }

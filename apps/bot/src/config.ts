@@ -3,7 +3,7 @@ import { z } from "zod";
 import { DatabaseOptions } from "./database/DatabaseOptions";
 import { RawCommandOptions } from "./client/Command";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Validate the environment once, at startup, so misconfiguration fails fast
 // with a clear message instead of surfacing as a confusing runtime error.

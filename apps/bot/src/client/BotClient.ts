@@ -14,6 +14,7 @@ import { COMMANDS, RawCommand, RawCommandOptions } from "./Command";
 import mongoose from "mongoose";
 import { DatabaseOptions } from "../database/DatabaseOptions";
 import MusicSubscription from "./Subscription";
+import { logger } from "../logger";
 
 export default class BotClient extends Client {
   public dbOptions: DatabaseOptions;
@@ -39,12 +40,12 @@ export default class BotClient extends Client {
     this.collectors = new Collection<string, InteractionCollector<any>>();
   }
   public start() {
-    console.log("Starting Bot");
+    logger.info("Starting Bot");
     this.init();
     this.login(this.token);
   }
   public init() {
-    console.log("Initializing Bot");
+    logger.info("Initializing Bot");
     this.loadCommands();
     this.loadRawCommands();
     this.loadEventListeners();
@@ -53,7 +54,7 @@ export default class BotClient extends Client {
   }
   private loadCommands() {
     const commandPath = join(__dirname, "..", "commands");
-    console.log(`Loading Commands`);
+    logger.info("Loading Commands");
     const commandFiles = fs
       .readdirSync(commandPath)
       .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
@@ -62,7 +63,7 @@ export default class BotClient extends Client {
       import(`../commands/${file}`).then((dflt: { default: COMMANDS }) => {
         const command = dflt.default;
         this.commands.set(command.data.name, command);
-        console.log(`➕ Adding Command: ${command.data.name}`);
+        logger.info(`Adding command: ${command.data.name}`);
       });
     }
     //add listener for slash command
@@ -71,16 +72,16 @@ export default class BotClient extends Client {
       const command = this.commands.get(interaction.commandName);
       if (!command) return;
       const location = interaction.guild ? ` on ${interaction.guild.name}` : "";
-      console.log(
-        `Command Triggered: ${interaction.user.tag} triggered /${command.data.name}${location}`
+      logger.info(
+        `Command triggered: ${interaction.user.tag} used /${command.data.name}${location}`
       );
       //Execute the command, catching both sync throws and async rejections
       try {
         await command.execute(interaction);
       } catch (error) {
-        console.error(
-          `Error executing command /${interaction.commandName}:`,
-          error
+        logger.error(
+          { err: error },
+          `Error executing command /${interaction.commandName}`
         );
         await this.replyWithError(interaction);
       }
@@ -98,15 +99,15 @@ export default class BotClient extends Client {
         await interaction.reply(payload);
       }
     } catch (err) {
-      console.error(
-        `Failed to send error reply for /${interaction.commandName}:`,
-        err
+      logger.error(
+        { err },
+        `Failed to send error reply for /${interaction.commandName}`
       );
     }
   }
   private async loadRawCommands() {
     const rawCommandPath = join(__dirname, "..", "rawCommands");
-    console.log(`Loading Raw Commands`);
+    logger.info("Loading Raw Commands");
     const rawCommandFiles = fs
       .readdirSync(rawCommandPath)
       .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
@@ -116,7 +117,7 @@ export default class BotClient extends Client {
         (dflt: { default: RawCommand }) => {
           const rawCommand = dflt.default;
           this.rawCommands.set(rawCommand.name, rawCommand);
-          console.log(`➕ Adding Raw Command: ${rawCommand.name}`);
+          logger.info(`Adding raw command: ${rawCommand.name}`);
         }
       );
     }
@@ -128,16 +129,16 @@ export default class BotClient extends Client {
           args[0].substring(1)
         );
         if (rawCommand) {
-          console.log(
-            `Raw Command Triggered: ${message.author.tag} triggered ${rawCommand.name}: ${message.content}`
+          logger.info(
+            `Raw command triggered: ${message.author.tag} used ${rawCommand.name}: ${message.content}`
           );
           //Execute the raw command, catching sync throws and async rejections
           try {
             await rawCommand.execute(message);
           } catch (error) {
-            console.error(
-              `Error executing raw command ${rawCommand.name}:`,
-              error
+            logger.error(
+              { err: error },
+              `Error executing raw command ${rawCommand.name}`
             );
           }
         }
@@ -145,14 +146,14 @@ export default class BotClient extends Client {
     });
   }
   private loadEventListeners() {
-    console.log("Loading Event Listeners");
+    logger.info("Loading Event Listeners");
     const eventPath = join(__dirname, "..", "events");
     const eventFiles = fs
       .readdirSync(eventPath)
       .filter((file) => file.endsWith(".ts") || file.endsWith(".js"));
     for (const file of eventFiles) {
       import(`../events/${file}`).then((event) => {
-        console.log(`➕ Adding Event Listener: ${event.name}`);
+        logger.info(`Adding event listener: ${event.name}`);
         if (event.once) {
           this.once(event.name, (...args) => event.execute(...args));
         } else {
@@ -166,7 +167,7 @@ export default class BotClient extends Client {
       await mongoose.connect(
         `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`
       );
-      console.log(`Connected to MongoDB`);
+      logger.info("Connected to MongoDB");
     } catch (err) {
       throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
     }
@@ -176,23 +177,23 @@ export default class BotClient extends Client {
       // Ignore repeat signals so shutdown only runs once.
       if (this.shuttingDown) return;
       this.shuttingDown = true;
-      console.info(`${signal} received - shutting down gracefully`);
+      logger.info(`${signal} received - shutting down gracefully`);
       // Never let a stuck shutdown hang the process forever.
       const forceExit = setTimeout(() => {
-        console.error("Graceful shutdown timed out - forcing exit");
+        logger.error("Graceful shutdown timed out - forcing exit");
         process.exit(1);
       }, 10000);
       forceExit.unref();
       try {
-        console.log("Logging off from Discord");
+        logger.info("Logging off from Discord");
         await this.destroy();
-        console.log("Closing MongoDB connection");
+        logger.info("Closing MongoDB connection");
         await mongoose.connection.close();
-        console.log("Shutdown complete");
+        logger.info("Shutdown complete");
         clearTimeout(forceExit);
         process.exit(0);
       } catch (err) {
-        console.error("Error during shutdown:", err);
+        logger.error({ err }, "Error during shutdown");
         clearTimeout(forceExit);
         process.exit(1);
       }

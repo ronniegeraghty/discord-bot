@@ -1,14 +1,15 @@
 import BotClient from "./client/BotClient";
 import { GatewayIntentBits } from "discord.js";
 import { config } from "./config";
+import { logger } from "./logger";
 
 // Global safety nets: a single command or stream error should never crash the
 // entire bot process. Log and keep running instead.
 process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled promise rejection:", reason);
+  logger.error({ err: reason }, "Unhandled promise rejection");
 });
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
+  logger.error({ err: error }, "Uncaught exception");
 });
 
 // Create instance of client

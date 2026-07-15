@@ -7,6 +7,7 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { CommandAbs } from "../client/Command";
+import { logger } from "../logger";
 
 class RPSCommand extends CommandAbs {
   public data = new SlashCommandBuilder()
@@ -65,8 +66,8 @@ class RPSCommand extends CommandAbs {
             const winnerUser = winner === i.user.id ? i.user : i.client.user;
             result = `${winnerUser.tag} Wins!`;
           }
-          console.log(
-            ` - User chose: ${i.customId} - Bot chose: ${randomHand} - ${result}`,
+          logger.info(
+            `RPS: user chose ${i.customId}, bot chose ${randomHand} - ${result}`
           );
         }
         i.update({

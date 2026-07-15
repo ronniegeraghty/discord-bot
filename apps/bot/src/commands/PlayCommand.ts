@@ -21,6 +21,7 @@ import { ResumeCommand } from "./ResumeCommand";
 import { PauseCommand } from "./PauseCommand";
 import { NextCommand } from "./NextCommand";
 import Track from "../client/Track";
+import { logger } from "../logger";
 
 const PlayCommand: CommandType = {
   data: new SlashCommandBuilder()
@@ -82,7 +83,9 @@ function createSubscription(
       adapterCreator: channel.guild.voiceAdapterCreator,
     })
   );
-  subscription.voiceConnection.on("error", console.warn);
+  subscription.voiceConnection.on("error", (err) =>
+    logger.warn({ err }, "Voice connection error")
+  );
   // Add new connection to the subscribtions collection on the client
   client.subscriptions.set(guildId, subscription);
   return subscription;
@@ -98,7 +101,7 @@ async function checkVoiceConnectionReady(
       20e3
     );
   } catch (error) {
-    console.warn(error);
+    logger.warn({ err: error }, "Failed to reach Ready voice state");
     await interaction.followUp(
       "Failed to join voice channel within 20 seconds, please try again later. "
     );
@@ -119,21 +122,23 @@ async function createTrack(
             content: `Now playing ${track.title}!`,
             flags: MessageFlags.Ephemeral,
           })
-          .catch(console.warn);
+          .catch((err) =>
+            logger.warn({ err }, "Failed to send now-playing message")
+          );
       },
       onFinish() {
         // no need for follow up message on finish.
       },
       onError(error) {
-        console.warn(error);
+        logger.warn({ err: error }, "Track playback error");
         interaction
           .followUp({ content: `Error: ${error}`, flags: MessageFlags.Ephemeral })
-          .catch(console.warn);
+          .catch((err) => logger.warn({ err }, "Failed to send error follow-up"));
       },
     });
     return track;
   } catch (error) {
-    console.warn(` - Warn Error: ${error}`);
+    logger.warn({ err: error }, "Failed to create track");
     await interaction.followUp(
       `Failed to play track. Reason: ${error}\nPlease try again later!`
     );
@@ -204,7 +209,7 @@ function createButtonInteractionCollector(
   const { guildId, channelId, client } = interaction;
   //type Check on properties
   if (!(client instanceof BotClient)) {
-    console.warn(` - Client not instance of BotCleint`);
+    logger.warn("Client is not an instance of BotClient");
     return;
   }
   // Check if channel has message collector for playback buttons already, if so return
@@ -225,13 +230,7 @@ function createButtonInteractionCollector(
   // Add on "collect" event listener to the collector
   collector.on("collect", async (i) => {
     if (i instanceof ButtonInteraction) {
-      console.log(
-        `Collector Triggered: ${i.user.tag} triggered Collector: ${
-          i.customId
-        } on Server: ${i.guild.name} in channel #${
-          i.guild.channels.cache.get(i.channelId).name
-        }`
-      );
+      logger.info(`Collector triggered: ${i.user.tag} pressed ${i.customId}`);
       if (i.isButton()) {
         handlePlayBackButton(i);
       }
