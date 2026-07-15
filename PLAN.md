@@ -43,12 +43,12 @@ Living checklist for the modernization, hardening, and feature work. Check items
 - [x] Re-test playback end-to-end in Discord (play / pause / queue / skip / leave confirmed working)
 
 ## Phase 2 — Hardening & reorganization (Turborepo)
-- [ ] Convert to Turborepo monorepo: `apps/bot`, `apps/stream-client`, `packages/protocol` (shared types), `packages/*`
+- [x] Convert to Turborepo monorepo: `apps/bot` + `packages/protocol` (shared types) via npm workspaces + turbo _(`apps/stream-client` added in Phase 4)_
 - [ ] Introduce `AudioSource` abstraction (pluggable engine: YouTube / file / live stream) — _moved from Phase 1_
 - [ ] Centralized config validation (`zod`, fail-fast on missing env)
 - [ ] Structured logging (`pino`) replacing `console.log`
 - [ ] Command error wrapper (consistent catch + ephemeral reply)
-- [ ] Fix deprecations: `ephemeral` → `flags: MessageFlags.Ephemeral`; `ready` → `clientReady`
+- [x] Fix deprecations: `ephemeral` → `flags: MessageFlags.Ephemeral`; `ready` → `clientReady`
 - [ ] Graceful shutdown; health/readiness endpoint
 
 ## Phase 3 — Tests without Discord (Vitest)
