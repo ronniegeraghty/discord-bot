@@ -1,10 +1,12 @@
 import { join } from "path";
 import fs from "fs";
 import {
+  ChatInputCommandInteraction,
   Client,
   ClientOptions,
   Collection,
   InteractionCollector,
+  InteractionReplyOptions,
   Message,
   MessageFlags,
 } from "discord.js";
@@ -67,26 +69,39 @@ export default class BotClient extends Client {
       if (!interaction.isChatInputCommand()) return;
       const command = this.commands.get(interaction.commandName);
       if (!command) return;
+      const location = interaction.guild ? ` on ${interaction.guild.name}` : "";
       console.log(
-        `Command Triggered: ${interaction.user.tag} triggered Command: ${
-          command.data.name
-        }, on Server: ${interaction.guild.name} in channel #${
-          interaction.guild.channels.cache.get(interaction.channelId).name
-        }\n - ${interaction}`
+        `Command Triggered: ${interaction.user.tag} triggered /${command.data.name}${location}`
       );
-      //Try executing command
+      //Execute the command, catching both sync throws and async rejections
       try {
-        command.execute(interaction);
+        await command.execute(interaction);
       } catch (error) {
         console.error(
-          `Error executing command: ${interaction.commandName} - Error: ${error}`
+          `Error executing command /${interaction.commandName}:`,
+          error
         );
-        await interaction.reply({
-          content: "There was an error while executing this command!",
-          flags: MessageFlags.Ephemeral,
-        });
+        await this.replyWithError(interaction);
       }
     });
+  }
+  private async replyWithError(interaction: ChatInputCommandInteraction) {
+    const payload: InteractionReplyOptions = {
+      content: "There was an error while executing this command!",
+      flags: MessageFlags.Ephemeral,
+    };
+    try {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp(payload);
+      } else {
+        await interaction.reply(payload);
+      }
+    } catch (err) {
+      console.error(
+        `Failed to send error reply for /${interaction.commandName}:`,
+        err
+      );
+    }
   }
   private async loadRawCommands() {
     const rawCommandPath = join(__dirname, "..", "rawCommands");
@@ -113,20 +128,15 @@ export default class BotClient extends Client {
         );
         if (rawCommand) {
           console.log(
-            `Raw Command Triggered: ${
-              message.author.tag
-            } triggered Raw Command: ${rawCommand.name}, on Server: ${
-              message.guild.name
-            } in channel #${
-              message.guild.channels.cache.get(message.channelId).name
-            }\n - ${message.content} `
+            `Raw Command Triggered: ${message.author.tag} triggered ${rawCommand.name}: ${message.content}`
           );
-          //Try executing command
+          //Execute the raw command, catching sync throws and async rejections
           try {
-            rawCommand.execute(message);
+            await rawCommand.execute(message);
           } catch (error) {
             console.error(
-              `Error executing command: ${rawCommand.name} - Message: ${message.content} - Error: ${error}`
+              `Error executing raw command ${rawCommand.name}:`,
+              error
             );
           }
         }
