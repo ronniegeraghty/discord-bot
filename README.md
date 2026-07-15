@@ -35,11 +35,10 @@ A discord bot to run and host yourself to bring music playback to your discord s
       docker-compose up --build
       ```
 
-  - Node.js: _Note: Requires [Node.js](https://nodejs.org/en/download/) v16 or higher & and MongoDB database._
+  - Node.js: _Note: Requires [Node.js](https://nodejs.org/en/download/) v18 or higher & a MongoDB database._
 
     - ```shell
       npm i
-      .\ci\postInstallFixes.sh
       npm run build
       npm run start
       ```

@@ -11,7 +11,7 @@ import SubscribedGuild, {
 } from "./database/schemas/SubscribedGuilds";
 import mongoose from "mongoose";
 import * as dotenv from "dotenv";
-import { DatabaseOptions } from "./database/DatabaseOptions.type";
+import { DatabaseOptions } from "./database/DatabaseOptions";
 dotenv.config();
 
 const token = process.env.DISCORD_TOKEN;
@@ -163,7 +163,7 @@ export function unsubscribeFromCommands(
         })
         .then(() =>
           console.log(
-            ` - Successfully wipied application commands for ${guild.guildId}`
+            ` - Successfully wiped application commands for ${guild.guildId}`
           )
         )
         .then(() => resolve())

@@ -1,7 +1,7 @@
 import BotClient from "./client/BotClient";
 import { GatewayIntentBits } from "discord.js";
 import * as dotenv from "dotenv";
-import { DatabaseOptions } from "./database/DatabaseOptions.type";
+import { DatabaseOptions } from "./database/DatabaseOptions";
 import { RawCommandOptions } from "./client/Command";
 dotenv.config();
 

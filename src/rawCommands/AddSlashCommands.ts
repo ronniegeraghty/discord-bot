@@ -17,10 +17,10 @@ class AddSlashCommands extends RawCommand {
           "Server already subscribed to slash commands! Refreshing command list ... "
         );
       if (!doc) {
-        const subsribedGuild = new SubscribedGuild({
+        const subscribedGuild = new SubscribedGuild({
           guildId: guildId,
         });
-        await subsribedGuild.save();
+        await subscribedGuild.save();
         replyMessage = message.reply(
           "Server now subscribed to slash commands. Uploading slash commands to server ... "
         );

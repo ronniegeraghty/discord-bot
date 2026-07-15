@@ -28,7 +28,7 @@ export class ResumeCommand extends CommandAbs {
       if (!subscription) {
         await interaction.followUp({
           content:
-            "There is no music palying in this server. Use /play to start playing music.",
+            "There is no music playing in this server. Use /play to start playing music.",
           ephemeral: true,
         });
         return;

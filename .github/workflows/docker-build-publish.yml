@@ -25,20 +25,20 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       # Set up QEMU for emulation to build against other platforms
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
 
       # Set up Docker Buildx
       - name: Set Up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
 
       # Login to GHCR
       - name: Login to GitHub Container Registry
         if: ${{env.PUSH_PACKAGES == 'true'}}
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           registry: ${{env.REGISTRY}}
           username: ${{github.actor}}
@@ -64,19 +64,19 @@ jobs:
       #Create a GitHub Release from tag
       - name: Create Release
         if: ${{env.PUSH_PACKAGES == 'true'}}
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
         with:
           tag_name: ${{steps.gen-tags.outputs.git-tag}}
-          release_name: Release ${{steps.gen-tags.outputs.git-tag}}
+          name: Release ${{steps.gen-tags.outputs.git-tag}}
           draft: false
           prerelease: false
 
       # Run Docker build
       - name: Run Docker Build & Publish
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           push: ${{env.PUSH_PACKAGES}}
           context: .

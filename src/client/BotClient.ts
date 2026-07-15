@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { COMMANDS, RawCommand, RawCommandOptions } from "./Command";
 import mongoose from "mongoose";
-import { DatabaseOptions } from "../database/DatabaseOptions.type";
+import { DatabaseOptions } from "../database/DatabaseOptions";
 import MusicSubscription from "./Subscription";
 
 export default class BotClient extends Client {
@@ -161,7 +161,7 @@ export default class BotClient extends Client {
   }
   killBot() {
     process.on("SIGTERM", async () => {
-      console.info("SIGTERM singal revieved");
+      console.info("SIGTERM signal received");
       console.log("Logging off from Discord");
       await this.destroy();
       console.log("Logged off");

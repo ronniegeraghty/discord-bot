@@ -87,7 +87,7 @@ export default class Track implements TrackData {
     return new Promise(async (resolve, reject) => {
       const urlType = this.getURLType(url);
       const title = await this.getTitle(url, urlType);
-      if (!title) reject("Invalide URL Type");
+      if (!title) reject("Invalid URL Type");
       //The methods are wrapped so that we can ensure that they are only called once.
       const wrapperMethods = {
         onStart() {
