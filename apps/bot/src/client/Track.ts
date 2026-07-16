@@ -12,6 +12,31 @@ import ffmpegStatic from "ffmpeg-static";
 // bundled static binary (handy for local dev), then whatever is on PATH.
 const ffmpegPath = process.env.FFMPEG_PATH || ffmpegStatic || "ffmpeg";
 
+// Resolve once the readable side of `stream` holds at least `targetBytes`, the
+// stream has ended, or a short safety timeout elapses.
+function waitForBuffer(
+  stream: PassThrough,
+  targetBytes: number,
+): Promise<void> {
+  return new Promise((resolve) => {
+    if (stream.readableLength >= targetBytes || stream.writableEnded) {
+      resolve();
+      return;
+    }
+    const interval = setInterval(() => {
+      if (stream.readableLength >= targetBytes || stream.writableEnded) {
+        clearInterval(interval);
+        resolve();
+      }
+    }, 50);
+    // Safety: don't wait forever if the source is slow to produce data.
+    setTimeout(() => {
+      clearInterval(interval);
+      resolve();
+    }, 5000).unref();
+  });
+}
+
 /**
  * This is the data required to create a Track Object
  */
@@ -96,6 +121,7 @@ export default class Track implements TrackData {
         "-f", "ogg",
         "-ar", "48000",
         "-ac", "2",
+        "-frame_duration", "20",
         "pipe:1",
       ],
       { stdio: ["ignore", "pipe", "ignore"] },
@@ -119,6 +145,11 @@ export default class Track implements TrackData {
     buffered.once("error", cleanup);
     buffered.once("close", cleanup);
     stream.pipe(buffered);
+
+    // Give playback a head start: wait until a cushion is buffered (or the
+    // source ends) before handing the stream to the player, so the opening
+    // seconds don't stutter while FFmpeg is still connecting to the source.
+    await waitForBuffer(buffered, 256 * 1024);
 
     return createAudioResource(buffered, {
       metadata: this,
