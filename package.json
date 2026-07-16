@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "test": "turbo run test",
     "start:bot": "npm run start --workspace @ronbot/bot",
+    "start:native": "npm run build && node apps/bot/build/Bot.js",
     "deploy-commands": "npm run deploy-commands --workspace @ronbot/bot",
     "wipe-commands": "npm run wipe-commands --workspace @ronbot/bot"
   },

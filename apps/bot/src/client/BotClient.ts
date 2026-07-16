@@ -163,13 +163,24 @@ export default class BotClient extends Client {
     }
   }
   private async connectDatabase() {
+    // Surface later connection errors as warnings instead of crashing on an
+    // unhandled 'error' event.
+    mongoose.connection.on("error", (err) =>
+      logger.warn({ err }, "MongoDB connection error")
+    );
     try {
       await mongoose.connect(
-        `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`
+        `mongodb://${this.dbOptions.username}:${this.dbOptions.password}@${this.dbOptions.url}:${this.dbOptions.port}/${this.dbOptions.dbName}?${this.dbOptions.dbOptions}`,
+        { serverSelectionTimeoutMS: 5000 }
       );
       logger.info("Connected to MongoDB");
     } catch (err) {
-      throw new Error(`Error Connecting to MongoDB - ERROR: ${err}`);
+      // A DB outage shouldn't take the bot down — playback works without it
+      // (only slash-command deployment needs MongoDB).
+      logger.warn(
+        { err },
+        "Could not connect to MongoDB; continuing without it"
+      );
     }
   }
   private killBot() {
