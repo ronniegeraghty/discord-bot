@@ -22,9 +22,15 @@ COPY package.json package-lock.json ./
 COPY apps/bot/package.json ./apps/bot/
 COPY packages/protocol/package.json ./packages/protocol/
 RUN npm ci --omit=dev
+# tini = tiny init for correct PID 1 behavior (signal forwarding + zombie reaping).
+# Installed after npm ci so the expensive dependency layer stays cached.
+RUN apk add --no-cache tini
 USER node
 COPY --from=ts-compiler --chown=node /repo/apps/bot/build/ ./apps/bot/build/
 WORKDIR /repo/apps/bot
-# Start
-ENTRYPOINT ["npm", "start"]
+# Run node directly under tini as PID 1. `npm start` as PID 1 is an anti-pattern:
+# npm doesn't forward signals or reap zombies, so SIGTERM (graceful shutdown) and
+# child-process cleanup are unreliable. tini handles both correctly.
+ENTRYPOINT ["/sbin/tini", "--"]
+CMD ["node", "./build/Bot.js"]
 
