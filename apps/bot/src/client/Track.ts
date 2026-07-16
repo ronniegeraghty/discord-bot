@@ -69,6 +69,9 @@ export default class Track implements TrackData {
           noWarnings: true,
           noPlaylist: true,
           noCheckCertificates: true,
+          // Give yt-dlp a JS runtime so it doesn't fall back to throttled
+          // YouTube formats, which caused the audio to cut out mid-track.
+          jsRuntimes: "node",
         },
         { stdio: ["ignore", "pipe", "ignore"] },
       );
@@ -115,6 +118,9 @@ export default class Track implements TrackData {
       noWarnings: true,
       noPlaylist: true,
       noCheckCertificates: true,
+      // Use the container's Node as yt-dlp's JS runtime so YouTube extraction
+      // isn't degraded/throttled (a missing runtime caused audio drop-outs).
+      jsRuntimes: "node",
     })) as { title?: string; thumbnail?: string };
 
     // The methods are wrapped so that we can ensure they are only called once.
@@ -143,26 +149,18 @@ export default class Track implements TrackData {
     });
   }
   public static getURLType(url: string): ULRTYPES | null {
-    const endIndex: number = this.findUrlEndPoint(url);
-    switch (url.substring(0, endIndex)) {
-      case "https://www.youtube":
-        return "youtube";
-      case "https://youtu":
-        return "youtube";
-      case "https://soundcloud":
-        return "soundcloud";
-      default:
-        return null;
+    let host: string;
+    try {
+      host = new URL(url).hostname.toLowerCase();
+    } catch {
+      return null;
     }
-  }
-  public static findUrlEndPoint(url: string): number {
-    const endPointList = [".com", ".be"];
-    for (const endPoint of endPointList) {
-      const endPointIndex = url.toString().indexOf(endPoint);
-      if (endPointIndex !== -1) {
-        return endPointIndex;
-      }
-    }
-    return 0;
+    // Match the domain (and any subdomain like www./m./music./on.) rather than
+    // a brittle string prefix, so share and mobile links are recognised too.
+    const isHost = (domain: string) =>
+      host === domain || host.endsWith(`.${domain}`);
+    if (host === "youtu.be" || isHost("youtube.com")) return "youtube";
+    if (isHost("soundcloud.com")) return "soundcloud";
+    return null;
   }
 }

@@ -49,6 +49,10 @@ const PlayCommand: CommandType = {
         return;
       }
       await interaction.deferReply();
+      // Resolve the track FIRST so the bot only joins voice for a valid,
+      // playable link — an invalid URL shouldn't drag it into the channel.
+      const track = await createTrack(url, interaction);
+      if (!track) return; // createTrack already sent the failure message
       // get existing music subscription for server if one exisits
       let subscription = client.subscriptions.get(guildId);
       // If there is no connection to the guild create one
@@ -58,9 +62,6 @@ const PlayCommand: CommandType = {
       // Make sure the connection is ready before processing the user's request
       // If not ready return
       if (!(await checkVoiceConnectionReady(subscription, interaction))) return;
-
-      // Attempt to create a Track from the user's video URL
-      const track = await createTrack(url, interaction);
       //Add track to the queue
       subscription.enqueue(track);
       // Send Queued follow up message

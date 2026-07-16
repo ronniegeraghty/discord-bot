@@ -11,25 +11,16 @@ vi.mock("@discordjs/voice", () => ({
 
 import Track from "./Track";
 
-describe("Track.findUrlEndPoint", () => {
-  it("finds the index of a .com endpoint", () => {
-    expect(Track.findUrlEndPoint("https://www.youtube.com/watch?v=abc")).toBe(
-      19
-    );
-  });
-
-  it("finds the index of a .be endpoint", () => {
-    expect(Track.findUrlEndPoint("https://youtu.be/abc")).toBe(13);
-  });
-
-  it("returns 0 when no known endpoint is present", () => {
-    expect(Track.findUrlEndPoint("not-a-url")).toBe(0);
-  });
-});
-
 describe("Track.getURLType", () => {
-  it("detects full youtube.com URLs", () => {
+  it("detects youtube.com URLs with or without a subdomain", () => {
     expect(Track.getURLType("https://www.youtube.com/watch?v=abc")).toBe(
+      "youtube"
+    );
+    expect(Track.getURLType("https://youtube.com/watch?v=abc")).toBe("youtube");
+    expect(Track.getURLType("https://m.youtube.com/watch?v=abc")).toBe(
+      "youtube"
+    );
+    expect(Track.getURLType("https://music.youtube.com/watch?v=abc")).toBe(
       "youtube"
     );
   });
@@ -38,13 +29,21 @@ describe("Track.getURLType", () => {
     expect(Track.getURLType("https://youtu.be/abc")).toBe("youtube");
   });
 
-  it("detects soundcloud URLs", () => {
+  it("detects soundcloud URLs including share and mobile subdomains", () => {
     expect(Track.getURLType("https://soundcloud.com/artist/track")).toBe(
+      "soundcloud"
+    );
+    expect(Track.getURLType("https://on.soundcloud.com/abcd")).toBe(
+      "soundcloud"
+    );
+    expect(Track.getURLType("https://m.soundcloud.com/artist/track")).toBe(
       "soundcloud"
     );
   });
 
-  it("returns null for unsupported URLs", () => {
+  it("returns null for unsupported or malformed URLs", () => {
     expect(Track.getURLType("https://example.com/foo")).toBeNull();
+    expect(Track.getURLType("https://notyoutube.com/foo")).toBeNull();
+    expect(Track.getURLType("not a url")).toBeNull();
   });
 });
