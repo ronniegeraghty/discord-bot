@@ -5,6 +5,7 @@ import {
 } from "@discordjs/voice";
 import youtubedl from "youtube-dl-exec";
 import { spawn } from "node:child_process";
+import { PassThrough } from "node:stream";
 import ffmpegStatic from "ffmpeg-static";
 
 // Prefer an explicit path (set in the container to the system ffmpeg), then the
@@ -106,15 +107,20 @@ export default class Track implements TrackData {
       throw new Error("Failed to start the audio transcoder.");
     }
 
-    // Clean up the FFmpeg process once playback ends or the stream errors.
+    // Buffer well ahead of real-time so brief network hiccups can't starve
+    // playback. FFmpeg races ahead and fills this buffer (a whole track is only
+    // a few MB of Opus), then Discord drains it smoothly from memory.
+    const buffered = new PassThrough({ highWaterMark: 1 << 24 });
     const cleanup = () => {
       if (!ffmpeg.killed) ffmpeg.kill("SIGKILL");
     };
     ffmpeg.once("error", cleanup);
     stream.once("error", cleanup);
-    stream.once("close", cleanup);
+    buffered.once("error", cleanup);
+    buffered.once("close", cleanup);
+    stream.pipe(buffered);
 
-    return createAudioResource(stream, {
+    return createAudioResource(buffered, {
       metadata: this,
       inputType: StreamType.OggOpus,
     });
