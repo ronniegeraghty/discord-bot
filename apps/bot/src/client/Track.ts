@@ -1,9 +1,15 @@
 import {
   AudioResource,
   createAudioResource,
-  demuxProbe,
+  StreamType,
 } from "@discordjs/voice";
 import youtubedl from "youtube-dl-exec";
+import { spawn } from "node:child_process";
+import ffmpegStatic from "ffmpeg-static";
+
+// Prefer an explicit path (set in the container to the system ffmpeg), then the
+// bundled static binary (handy for local dev), then whatever is on PATH.
+const ffmpegPath = process.env.FFMPEG_PATH || ffmpegStatic || "ffmpeg";
 
 /**
  * This is the data required to create a Track Object
@@ -56,47 +62,61 @@ export default class Track implements TrackData {
     this.onError = onError;
   }
 
-  public createAudioResource(): Promise<AudioResource<Track>> {
-    return new Promise((resolve, reject) => {
-      // Stream the best audio track from yt-dlp straight to stdout; demuxProbe
-      // detects the container/codec so it can play without re-encoding.
-      const subprocess = youtubedl.exec(
-        this.url,
-        {
-          output: "-",
-          format: "bestaudio[acodec=opus]/bestaudio/best",
-          quiet: true,
-          noWarnings: true,
-          noPlaylist: true,
-          noCheckCertificates: true,
-          // Give yt-dlp a JS runtime so it doesn't fall back to throttled
-          // YouTube formats, which caused the audio to cut out mid-track.
-          jsRuntimes: "node",
-        },
-        { stdio: ["ignore", "pipe", "ignore"] },
-      );
+  public async createAudioResource(): Promise<AudioResource<Track>> {
+    // Resolve the direct media URL at play time (URLs can expire while queued).
+    // yt-dlp needs a JS runtime so YouTube returns a full-speed (un-throttled)
+    // URL instead of one that starves the buffer and makes the audio cut out.
+    const resolved = await youtubedl(this.url, {
+      format: "bestaudio[acodec=opus]/bestaudio/best",
+      getUrl: true,
+      noWarnings: true,
+      noPlaylist: true,
+      noCheckCertificates: true,
+      jsRuntimes: "node",
+    });
+    const mediaUrl = String(resolved).trim().split("\n")[0];
+    if (!mediaUrl) {
+      throw new Error("Failed to resolve a playable media URL.");
+    }
 
-      const stream = subprocess.stdout;
-      if (!stream) {
-        reject(new Error("Failed to start audio stream."));
-        return;
-      }
+    // Let FFmpeg pull the media directly: it handles HLS (SoundCloud) and
+    // reconnects on network hiccups, emitting a uniform Ogg/Opus stream that
+    // Discord plays without the slow pure-JS encoder (and without the stalls
+    // caused by piping a non-seekable MP4 through the probe path).
+    const ffmpeg = spawn(
+      ffmpegPath,
+      [
+        "-reconnect", "1",
+        "-reconnect_streamed", "1",
+        "-reconnect_delay_max", "5",
+        "-i", mediaUrl,
+        "-vn",
+        "-c:a", "libopus",
+        "-f", "ogg",
+        "-ar", "48000",
+        "-ac", "2",
+        "pipe:1",
+      ],
+      { stdio: ["ignore", "pipe", "ignore"] },
+    );
 
-      // Surface spawn/stream errors as a rejection instead of letting them
-      // bubble up as an uncaught exception that crashes the bot.
-      subprocess.once("error", (error) => reject(error));
-      stream.once("error", (error) => reject(error));
+    const stream = ffmpeg.stdout;
+    if (!stream) {
+      ffmpeg.kill("SIGKILL");
+      throw new Error("Failed to start the audio transcoder.");
+    }
 
-      demuxProbe(stream)
-        .then((probe) =>
-          resolve(
-            createAudioResource(probe.stream, {
-              metadata: this,
-              inputType: probe.type,
-            }),
-          ),
-        )
-        .catch((error) => reject(error));
+    // Clean up the FFmpeg process once playback ends or the stream errors.
+    const cleanup = () => {
+      if (!ffmpeg.killed) ffmpeg.kill("SIGKILL");
+    };
+    ffmpeg.once("error", cleanup);
+    stream.once("error", cleanup);
+    stream.once("close", cleanup);
+
+    return createAudioResource(stream, {
+      metadata: this,
+      inputType: StreamType.OggOpus,
     });
   }
 

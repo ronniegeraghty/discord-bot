@@ -15,6 +15,7 @@ RUN npm run build
 FROM node:24-alpine AS prod
 WORKDIR /repo
 ENV YOUTUBE_DL_SKIP_PYTHON_CHECK=1
+ENV FFMPEG_PATH=/usr/bin/ffmpeg
 # ffmpeg for audio transcoding; python3 to run the yt-dlp binary
 RUN apk add --no-cache ffmpeg python3
 COPY package.json package-lock.json ./
